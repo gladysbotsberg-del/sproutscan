@@ -99,7 +99,6 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
         await new Promise<void>((resolve, reject) => {
           Quagga.init({
             inputStream: {
-              name: 'Live',
               type: 'LiveStream',
               target: container,
               constraints: {
