@@ -1,0 +1,1570 @@
+{
+  "safeIngredients": [
+    {
+      "id": "water",
+      "name": "Water",
+      "aliases": ["purified water", "filtered water", "spring water", "distilled water", "aqua"],
+      "category": "base",
+      "safe": true
+    },
+    {
+      "id": "salt",
+      "name": "Salt",
+      "aliases": ["sodium chloride", "sea salt", "table salt", "kosher salt", "himalayan salt", "iodized salt"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "sugar",
+      "name": "Sugar",
+      "aliases": ["cane sugar", "granulated sugar", "white sugar", "sucrose", "beet sugar", "raw sugar", "turbinado sugar", "caster sugar"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "brown_sugar",
+      "name": "Brown Sugar",
+      "aliases": ["light brown sugar", "dark brown sugar", "muscovado", "demerara sugar"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "powdered_sugar",
+      "name": "Powdered Sugar",
+      "aliases": ["confectioners sugar", "icing sugar", "10x sugar"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "honey",
+      "name": "Honey",
+      "aliases": ["raw honey", "clover honey", "wildflower honey", "manuka honey"],
+      "category": "sweetener",
+      "safe": true,
+      "note": "Safe for pregnant women; not for infants under 1"
+    },
+    {
+      "id": "maple_syrup",
+      "name": "Maple Syrup",
+      "aliases": ["pure maple syrup", "maple sugar"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "molasses",
+      "name": "Molasses",
+      "aliases": ["blackstrap molasses", "light molasses", "dark molasses", "treacle"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "agave",
+      "name": "Agave",
+      "aliases": ["agave nectar", "agave syrup", "blue agave"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "wheat_flour",
+      "name": "Wheat Flour",
+      "aliases": ["flour", "all-purpose flour", "bread flour", "cake flour", "pastry flour", "enriched flour", "bleached flour", "unbleached flour", "enriched wheat flour", "enriched bleached flour", "wheat"],
+      "category": "flour",
+      "safe": true
+    },
+    {
+      "id": "whole_wheat_flour",
+      "name": "Whole Wheat Flour",
+      "aliases": ["whole grain wheat flour", "graham flour", "whole wheat", "100% whole wheat"],
+      "category": "flour",
+      "safe": true
+    },
+    {
+      "id": "rice_flour",
+      "name": "Rice Flour",
+      "aliases": ["white rice flour", "brown rice flour", "sweet rice flour", "glutinous rice flour", "rice powder"],
+      "category": "flour",
+      "safe": true
+    },
+    {
+      "id": "corn_flour",
+      "name": "Corn Flour",
+      "aliases": ["cornmeal", "corn meal", "masa", "masa harina", "polenta", "grits", "yellow corn flour", "white corn flour", "degerminated corn flour", "degerminated yellow corn flour"],
+      "category": "flour",
+      "safe": true
+    },
+    {
+      "id": "oat_flour",
+      "name": "Oat Flour",
+      "aliases": ["oatmeal", "rolled oats", "steel cut oats", "oats", "whole grain oats", "quick oats", "instant oats"],
+      "category": "flour",
+      "safe": true
+    },
+    {
+      "id": "cornstarch",
+      "name": "Cornstarch",
+      "aliases": ["corn starch", "maize starch", "cornflour"],
+      "category": "starch",
+      "safe": true
+    },
+    {
+      "id": "tapioca_starch",
+      "name": "Tapioca Starch",
+      "aliases": ["tapioca", "tapioca flour", "cassava starch", "manioc"],
+      "category": "starch",
+      "safe": true
+    },
+    {
+      "id": "potato_starch",
+      "name": "Potato Starch",
+      "aliases": ["potato flour"],
+      "category": "starch",
+      "safe": true
+    },
+    {
+      "id": "arrowroot",
+      "name": "Arrowroot",
+      "aliases": ["arrowroot starch", "arrowroot powder", "arrowroot flour"],
+      "category": "starch",
+      "safe": true
+    },
+    {
+      "id": "modified_food_starch",
+      "name": "Modified Food Starch",
+      "aliases": ["modified starch", "modified corn starch", "modified tapioca starch"],
+      "category": "starch",
+      "safe": true
+    },
+    {
+      "id": "milk",
+      "name": "Milk",
+      "aliases": ["whole milk", "skim milk", "2% milk", "1% milk", "lowfat milk", "nonfat milk", "reduced fat milk", "pasteurized milk", "grade a milk"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "cream",
+      "name": "Cream",
+      "aliases": ["heavy cream", "whipping cream", "heavy whipping cream", "light cream", "half and half", "half & half", "coffee cream"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "butter",
+      "name": "Butter",
+      "aliases": ["sweet cream butter", "unsalted butter", "salted butter", "cultured butter", "cream butter"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "cheese",
+      "name": "Cheese",
+      "aliases": ["cheddar", "mozzarella", "parmesan", "swiss", "provolone", "monterey jack", "colby", "american cheese", "cream cheese", "cottage cheese", "ricotta"],
+      "category": "dairy",
+      "safe": true,
+      "note": "Pasteurized cheeses are safe; avoid unpasteurized soft cheeses"
+    },
+    {
+      "id": "cheese_cultures",
+      "name": "Cheese Cultures",
+      "aliases": ["cheese culture", "bacterial culture", "lactic acid culture", "starter culture"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "yogurt",
+      "name": "Yogurt",
+      "aliases": ["greek yogurt", "lowfat yogurt", "nonfat yogurt", "whole milk yogurt", "yoghurt"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "sour_cream",
+      "name": "Sour Cream",
+      "aliases": ["cultured cream", "creme fraiche"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "buttermilk",
+      "name": "Buttermilk",
+      "aliases": ["cultured buttermilk", "lowfat buttermilk"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "whey",
+      "name": "Whey",
+      "aliases": ["whey protein", "whey protein concentrate", "whey protein isolate", "sweet whey", "acid whey", "dried whey"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "casein",
+      "name": "Casein",
+      "aliases": ["milk protein", "sodium caseinate", "calcium caseinate", "caseinates"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "lactose",
+      "name": "Lactose",
+      "aliases": ["milk sugar"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "nonfat_dry_milk",
+      "name": "Nonfat Dry Milk",
+      "aliases": ["dry milk", "milk powder", "powdered milk", "skim milk powder", "dried milk"],
+      "category": "dairy",
+      "safe": true
+    },
+    {
+      "id": "eggs",
+      "name": "Eggs",
+      "aliases": ["whole eggs", "egg", "chicken eggs", "large eggs"],
+      "category": "protein",
+      "safe": true,
+      "note": "Cook thoroughly during pregnancy"
+    },
+    {
+      "id": "egg_whites",
+      "name": "Egg Whites",
+      "aliases": ["egg white", "albumen", "dried egg whites", "egg white powder"],
+      "category": "protein",
+      "safe": true
+    },
+    {
+      "id": "egg_yolks",
+      "name": "Egg Yolks",
+      "aliases": ["egg yolk", "dried egg yolks"],
+      "category": "protein",
+      "safe": true
+    },
+    {
+      "id": "vegetable_oil",
+      "name": "Vegetable Oil",
+      "aliases": ["soybean oil", "canola oil", "corn oil", "sunflower oil", "safflower oil", "cottonseed oil", "peanut oil", "blend of vegetable oils"],
+      "category": "oil",
+      "safe": true
+    },
+    {
+      "id": "olive_oil",
+      "name": "Olive Oil",
+      "aliases": ["extra virgin olive oil", "virgin olive oil", "pure olive oil", "light olive oil", "evoo"],
+      "category": "oil",
+      "safe": true
+    },
+    {
+      "id": "coconut_oil",
+      "name": "Coconut Oil",
+      "aliases": ["virgin coconut oil", "refined coconut oil", "coconut fat"],
+      "category": "oil",
+      "safe": true
+    },
+    {
+      "id": "palm_oil",
+      "name": "Palm Oil",
+      "aliases": ["palm kernel oil", "palm fruit oil", "sustainable palm oil"],
+      "category": "oil",
+      "safe": true
+    },
+    {
+      "id": "sesame_oil",
+      "name": "Sesame Oil",
+      "aliases": ["toasted sesame oil", "sesame seed oil"],
+      "category": "oil",
+      "safe": true
+    },
+    {
+      "id": "avocado_oil",
+      "name": "Avocado Oil",
+      "aliases": [],
+      "category": "oil",
+      "safe": true
+    },
+    {
+      "id": "shortening",
+      "name": "Shortening",
+      "aliases": ["vegetable shortening"],
+      "category": "fat",
+      "safe": true
+    },
+    {
+      "id": "lard",
+      "name": "Lard",
+      "aliases": ["pork fat", "rendered pork fat"],
+      "category": "fat",
+      "safe": true
+    },
+    {
+      "id": "chicken",
+      "name": "Chicken",
+      "aliases": ["chicken meat", "chicken breast", "chicken thigh", "cooked chicken", "roasted chicken", "grilled chicken"],
+      "category": "protein",
+      "safe": true,
+      "note": "Cook to 165°F internal temperature"
+    },
+    {
+      "id": "beef",
+      "name": "Beef",
+      "aliases": ["ground beef", "beef steak", "beef roast", "cooked beef"],
+      "category": "protein",
+      "safe": true,
+      "note": "Cook to safe internal temperature"
+    },
+    {
+      "id": "pork",
+      "name": "Pork",
+      "aliases": ["ground pork", "pork loin", "pork chop", "cooked pork"],
+      "category": "protein",
+      "safe": true,
+      "note": "Cook to 145°F internal temperature"
+    },
+    {
+      "id": "turkey",
+      "name": "Turkey",
+      "aliases": ["ground turkey", "turkey breast", "cooked turkey"],
+      "category": "protein",
+      "safe": true,
+      "note": "Cook to 165°F internal temperature"
+    },
+    {
+      "id": "fish",
+      "name": "Fish",
+      "aliases": ["salmon", "tilapia", "cod", "pollock", "catfish", "trout", "sardines", "anchovies", "herring"],
+      "category": "protein",
+      "safe": true,
+      "note": "Choose low-mercury options; limit to 2-3 servings per week"
+    },
+    {
+      "id": "shrimp",
+      "name": "Shrimp",
+      "aliases": ["prawns", "cooked shrimp"],
+      "category": "protein",
+      "safe": true,
+      "note": "Low in mercury; cook thoroughly"
+    },
+    {
+      "id": "soy",
+      "name": "Soy",
+      "aliases": ["soybeans", "soy protein", "soy protein isolate", "soy protein concentrate", "textured soy protein", "tsp", "tvp", "soy flour", "soy lecithin"],
+      "category": "protein",
+      "safe": true
+    },
+    {
+      "id": "tofu",
+      "name": "Tofu",
+      "aliases": ["bean curd", "soybean curd"],
+      "category": "protein",
+      "safe": true
+    },
+    {
+      "id": "pea_protein",
+      "name": "Pea Protein",
+      "aliases": ["pea protein isolate", "yellow pea protein"],
+      "category": "protein",
+      "safe": true
+    },
+    {
+      "id": "wheat_gluten",
+      "name": "Wheat Gluten",
+      "aliases": ["vital wheat gluten", "seitan", "gluten"],
+      "category": "protein",
+      "safe": true
+    },
+    {
+      "id": "gelatin",
+      "name": "Gelatin",
+      "aliases": ["beef gelatin", "pork gelatin", "unflavored gelatin"],
+      "category": "protein",
+      "safe": true
+    },
+    {
+      "id": "collagen",
+      "name": "Collagen",
+      "aliases": ["collagen peptides", "hydrolyzed collagen", "collagen protein"],
+      "category": "protein",
+      "safe": true
+    },
+    {
+      "id": "tomatoes",
+      "name": "Tomatoes",
+      "aliases": ["tomato", "tomato paste", "tomato puree", "tomato sauce", "crushed tomatoes", "diced tomatoes", "tomato concentrate", "sun-dried tomatoes"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "onion",
+      "name": "Onion",
+      "aliases": ["onions", "onion powder", "dried onion", "dehydrated onion", "minced onion", "onion flakes", "yellow onion", "white onion", "red onion"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "garlic",
+      "name": "Garlic",
+      "aliases": ["garlic powder", "dried garlic", "dehydrated garlic", "minced garlic", "garlic flakes", "roasted garlic", "granulated garlic"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "celery",
+      "name": "Celery",
+      "aliases": ["celery powder", "celery seed", "celery salt", "celery juice", "dried celery"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "carrot",
+      "name": "Carrot",
+      "aliases": ["carrots", "carrot juice", "carrot powder", "dried carrots", "dehydrated carrots"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "potato",
+      "name": "Potato",
+      "aliases": ["potatoes", "dried potatoes", "dehydrated potatoes", "potato flakes", "mashed potatoes", "potato powder"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "bell_pepper",
+      "name": "Bell Pepper",
+      "aliases": ["bell peppers", "red bell pepper", "green bell pepper", "yellow bell pepper", "sweet pepper", "capsicum"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "spinach",
+      "name": "Spinach",
+      "aliases": ["baby spinach", "spinach powder"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "broccoli",
+      "name": "Broccoli",
+      "aliases": ["broccoli florets"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "corn",
+      "name": "Corn",
+      "aliases": ["sweet corn", "yellow corn", "white corn", "corn kernels", "whole kernel corn"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "peas",
+      "name": "Peas",
+      "aliases": ["green peas", "sweet peas", "garden peas", "split peas"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "beans",
+      "name": "Beans",
+      "aliases": ["black beans", "kidney beans", "pinto beans", "navy beans", "white beans", "cannellini beans", "great northern beans", "lima beans", "refried beans"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "lentils",
+      "name": "Lentils",
+      "aliases": ["red lentils", "green lentils", "brown lentils"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "chickpeas",
+      "name": "Chickpeas",
+      "aliases": ["garbanzo beans", "ceci beans", "hummus"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "mushrooms",
+      "name": "Mushrooms",
+      "aliases": ["button mushrooms", "cremini mushrooms", "portobello mushrooms", "shiitake mushrooms", "mushroom powder"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "cabbage",
+      "name": "Cabbage",
+      "aliases": ["green cabbage", "red cabbage", "napa cabbage", "savoy cabbage"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "lettuce",
+      "name": "Lettuce",
+      "aliases": ["romaine lettuce", "iceberg lettuce", "leaf lettuce", "butter lettuce"],
+      "category": "vegetable",
+      "safe": true,
+      "note": "Wash thoroughly"
+    },
+    {
+      "id": "cucumber",
+      "name": "Cucumber",
+      "aliases": ["cucumbers", "pickles", "gherkins"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "zucchini",
+      "name": "Zucchini",
+      "aliases": ["courgette", "summer squash"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "squash",
+      "name": "Squash",
+      "aliases": ["butternut squash", "acorn squash", "spaghetti squash", "pumpkin", "winter squash"],
+      "category": "vegetable",
+      "safe": true
+    },
+    {
+      "id": "apple",
+      "name": "Apple",
+      "aliases": ["apples", "apple juice", "apple cider", "applesauce", "apple puree", "dried apples", "apple concentrate"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "orange",
+      "name": "Orange",
+      "aliases": ["oranges", "orange juice", "orange concentrate", "orange peel", "orange zest"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "lemon",
+      "name": "Lemon",
+      "aliases": ["lemons", "lemon juice", "lemon concentrate", "lemon peel", "lemon zest"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "lime",
+      "name": "Lime",
+      "aliases": ["limes", "lime juice", "lime concentrate", "lime peel", "lime zest"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "banana",
+      "name": "Banana",
+      "aliases": ["bananas", "banana puree", "dried banana", "banana chips"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "strawberry",
+      "name": "Strawberry",
+      "aliases": ["strawberries", "strawberry puree", "dried strawberries", "freeze-dried strawberries"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "blueberry",
+      "name": "Blueberry",
+      "aliases": ["blueberries", "blueberry puree", "dried blueberries", "wild blueberries"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "raspberry",
+      "name": "Raspberry",
+      "aliases": ["raspberries", "raspberry puree", "dried raspberries"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "grape",
+      "name": "Grape",
+      "aliases": ["grapes", "grape juice", "grape concentrate", "raisins", "dried grapes", "currants"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "cranberry",
+      "name": "Cranberry",
+      "aliases": ["cranberries", "cranberry juice", "dried cranberries", "craisins"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "cherry",
+      "name": "Cherry",
+      "aliases": ["cherries", "cherry juice", "dried cherries", "maraschino cherries", "tart cherries"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "peach",
+      "name": "Peach",
+      "aliases": ["peaches", "peach puree", "dried peaches"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "pear",
+      "name": "Pear",
+      "aliases": ["pears", "pear juice", "pear puree"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "mango",
+      "name": "Mango",
+      "aliases": ["mangoes", "mango puree", "dried mango"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "pineapple",
+      "name": "Pineapple",
+      "aliases": ["pineapple juice", "pineapple concentrate", "crushed pineapple", "dried pineapple"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "coconut",
+      "name": "Coconut",
+      "aliases": ["coconut milk", "coconut cream", "coconut water", "shredded coconut", "desiccated coconut", "coconut flakes", "coconut flour"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "dates",
+      "name": "Dates",
+      "aliases": ["date", "medjool dates", "date paste", "date syrup"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "figs",
+      "name": "Figs",
+      "aliases": ["fig", "dried figs", "fig paste"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "prunes",
+      "name": "Prunes",
+      "aliases": ["dried plums", "prune juice", "prune puree"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "apricot",
+      "name": "Apricot",
+      "aliases": ["apricots", "dried apricots", "apricot puree"],
+      "category": "fruit",
+      "safe": true
+    },
+    {
+      "id": "black_pepper",
+      "name": "Black Pepper",
+      "aliases": ["pepper", "ground pepper", "black pepper", "peppercorns", "cracked pepper"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "white_pepper",
+      "name": "White Pepper",
+      "aliases": ["ground white pepper"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "paprika",
+      "name": "Paprika",
+      "aliases": ["smoked paprika", "sweet paprika", "hot paprika", "spanish paprika", "hungarian paprika"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "cayenne",
+      "name": "Cayenne Pepper",
+      "aliases": ["cayenne", "red pepper", "ground red pepper", "crushed red pepper", "red pepper flakes"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "chili_powder",
+      "name": "Chili Powder",
+      "aliases": ["chile powder", "chilli powder", "ancho chili", "chipotle powder"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "cumin",
+      "name": "Cumin",
+      "aliases": ["ground cumin", "cumin seed", "cumin seeds"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "coriander",
+      "name": "Coriander",
+      "aliases": ["ground coriander", "coriander seed", "cilantro"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "turmeric",
+      "name": "Turmeric",
+      "aliases": ["ground turmeric", "turmeric powder", "curcumin"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "ginger",
+      "name": "Ginger",
+      "aliases": ["ground ginger", "ginger powder", "fresh ginger", "ginger root", "crystallized ginger"],
+      "category": "spice",
+      "safe": true,
+      "note": "May help with morning sickness"
+    },
+    {
+      "id": "cinnamon",
+      "name": "Cinnamon",
+      "aliases": ["ground cinnamon", "cinnamon sticks", "ceylon cinnamon", "cassia cinnamon"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "nutmeg",
+      "name": "Nutmeg",
+      "aliases": ["ground nutmeg"],
+      "category": "spice",
+      "safe": true,
+      "note": "Safe in culinary amounts"
+    },
+    {
+      "id": "allspice",
+      "name": "Allspice",
+      "aliases": ["ground allspice", "jamaican pepper", "pimento"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "cloves",
+      "name": "Cloves",
+      "aliases": ["ground cloves", "whole cloves"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "cardamom",
+      "name": "Cardamom",
+      "aliases": ["ground cardamom", "cardamom pods", "green cardamom"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "mustard",
+      "name": "Mustard",
+      "aliases": ["mustard seed", "mustard powder", "ground mustard", "yellow mustard", "dijon mustard", "prepared mustard"],
+      "category": "spice",
+      "safe": true
+    },
+    {
+      "id": "oregano",
+      "name": "Oregano",
+      "aliases": ["dried oregano", "mexican oregano"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "basil",
+      "name": "Basil",
+      "aliases": ["dried basil", "fresh basil", "sweet basil", "thai basil"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "thyme",
+      "name": "Thyme",
+      "aliases": ["dried thyme", "fresh thyme"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "rosemary",
+      "name": "Rosemary",
+      "aliases": ["dried rosemary", "fresh rosemary", "rosemary extract"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "sage",
+      "name": "Sage",
+      "aliases": ["dried sage", "fresh sage", "rubbed sage"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "parsley",
+      "name": "Parsley",
+      "aliases": ["dried parsley", "fresh parsley", "parsley flakes", "italian parsley", "flat leaf parsley"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "dill",
+      "name": "Dill",
+      "aliases": ["dried dill", "fresh dill", "dill weed", "dill seed"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "mint",
+      "name": "Mint",
+      "aliases": ["peppermint", "spearmint", "dried mint", "fresh mint"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "bay_leaf",
+      "name": "Bay Leaf",
+      "aliases": ["bay leaves", "laurel leaf"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "tarragon",
+      "name": "Tarragon",
+      "aliases": ["dried tarragon", "fresh tarragon"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "chives",
+      "name": "Chives",
+      "aliases": ["dried chives", "fresh chives"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "marjoram",
+      "name": "Marjoram",
+      "aliases": ["dried marjoram", "sweet marjoram"],
+      "category": "herb",
+      "safe": true
+    },
+    {
+      "id": "vanilla",
+      "name": "Vanilla",
+      "aliases": ["vanilla extract", "vanilla bean", "vanilla flavoring", "natural vanilla", "vanilla powder", "vanillin"],
+      "category": "flavoring",
+      "safe": true
+    },
+    {
+      "id": "almond_extract",
+      "name": "Almond Extract",
+      "aliases": ["natural almond flavor", "almond flavoring"],
+      "category": "flavoring",
+      "safe": true
+    },
+    {
+      "id": "cocoa",
+      "name": "Cocoa",
+      "aliases": ["cocoa powder", "dutch cocoa", "dutch process cocoa", "natural cocoa", "cacao", "cacao powder"],
+      "category": "flavoring",
+      "safe": true
+    },
+    {
+      "id": "chocolate",
+      "name": "Chocolate",
+      "aliases": ["dark chocolate", "milk chocolate", "white chocolate", "chocolate chips", "chocolate liquor", "cocoa butter", "baking chocolate", "semisweet chocolate"],
+      "category": "flavoring",
+      "safe": true,
+      "note": "Contains some caffeine; enjoy in moderation"
+    },
+    {
+      "id": "vinegar",
+      "name": "Vinegar",
+      "aliases": ["white vinegar", "distilled vinegar", "apple cider vinegar", "red wine vinegar", "white wine vinegar", "balsamic vinegar", "rice vinegar", "malt vinegar", "cider vinegar"],
+      "category": "acid",
+      "safe": true
+    },
+    {
+      "id": "citric_acid",
+      "name": "Citric Acid",
+      "aliases": ["e330", "sour salt"],
+      "category": "acid",
+      "safe": true
+    },
+    {
+      "id": "lactic_acid",
+      "name": "Lactic Acid",
+      "aliases": ["e270"],
+      "category": "acid",
+      "safe": true
+    },
+    {
+      "id": "malic_acid",
+      "name": "Malic Acid",
+      "aliases": ["e296"],
+      "category": "acid",
+      "safe": true
+    },
+    {
+      "id": "tartaric_acid",
+      "name": "Tartaric Acid",
+      "aliases": ["e334", "cream of tartar"],
+      "category": "acid",
+      "safe": true
+    },
+    {
+      "id": "phosphoric_acid",
+      "name": "Phosphoric Acid",
+      "aliases": ["e338"],
+      "category": "acid",
+      "safe": true
+    },
+    {
+      "id": "ascorbic_acid",
+      "name": "Ascorbic Acid",
+      "aliases": ["vitamin c", "e300"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "baking_soda",
+      "name": "Baking Soda",
+      "aliases": ["sodium bicarbonate", "bicarbonate of soda", "e500"],
+      "category": "leavening",
+      "safe": true
+    },
+    {
+      "id": "baking_powder",
+      "name": "Baking Powder",
+      "aliases": ["double acting baking powder"],
+      "category": "leavening",
+      "safe": true
+    },
+    {
+      "id": "yeast",
+      "name": "Yeast",
+      "aliases": ["active dry yeast", "instant yeast", "rapid rise yeast", "bread yeast", "bakers yeast", "nutritional yeast", "yeast extract", "brewers yeast", "autolyzed yeast", "autolyzed yeast extract"],
+      "category": "leavening",
+      "safe": true
+    },
+    {
+      "id": "vitamin_a",
+      "name": "Vitamin A",
+      "aliases": ["vitamin a palmitate", "retinyl palmitate", "beta carotene", "retinol"],
+      "category": "vitamin",
+      "safe": true,
+      "note": "Excessive vitamin A can be harmful; follow prenatal vitamin guidelines"
+    },
+    {
+      "id": "vitamin_b1",
+      "name": "Vitamin B1",
+      "aliases": ["thiamin", "thiamine", "thiamin mononitrate", "thiamine hydrochloride"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "vitamin_b2",
+      "name": "Vitamin B2",
+      "aliases": ["riboflavin", "riboflavin-5-phosphate"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "vitamin_b3",
+      "name": "Vitamin B3",
+      "aliases": ["niacin", "niacinamide", "nicotinic acid", "nicotinamide"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "vitamin_b5",
+      "name": "Vitamin B5",
+      "aliases": ["pantothenic acid", "calcium pantothenate", "d-pantothenate"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "vitamin_b6",
+      "name": "Vitamin B6",
+      "aliases": ["pyridoxine", "pyridoxine hydrochloride", "pyridoxal"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "vitamin_b9",
+      "name": "Vitamin B9",
+      "aliases": ["folic acid", "folate", "methylfolate", "l-methylfolate"],
+      "category": "vitamin",
+      "safe": true,
+      "note": "Essential for pregnancy; prevents neural tube defects"
+    },
+    {
+      "id": "vitamin_b12",
+      "name": "Vitamin B12",
+      "aliases": ["cobalamin", "cyanocobalamin", "methylcobalamin"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "vitamin_d",
+      "name": "Vitamin D",
+      "aliases": ["vitamin d3", "vitamin d2", "cholecalciferol", "ergocalciferol"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "vitamin_e",
+      "name": "Vitamin E",
+      "aliases": ["tocopherol", "alpha tocopherol", "d-alpha tocopherol", "mixed tocopherols", "tocopheryl acetate"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "vitamin_k",
+      "name": "Vitamin K",
+      "aliases": ["vitamin k1", "vitamin k2", "phytonadione", "phylloquinone", "menaquinone"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "iron",
+      "name": "Iron",
+      "aliases": ["ferrous sulfate", "ferrous fumarate", "ferrous gluconate", "iron oxide", "reduced iron", "ferric orthophosphate", "elemental iron"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "calcium",
+      "name": "Calcium",
+      "aliases": ["calcium carbonate", "calcium citrate", "calcium phosphate", "calcium sulfate", "tricalcium phosphate", "dicalcium phosphate", "calcium chloride"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "magnesium",
+      "name": "Magnesium",
+      "aliases": ["magnesium oxide", "magnesium citrate", "magnesium chloride", "magnesium sulfate"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "potassium",
+      "name": "Potassium",
+      "aliases": ["potassium chloride", "potassium citrate", "potassium phosphate"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "zinc",
+      "name": "Zinc",
+      "aliases": ["zinc oxide", "zinc sulfate", "zinc gluconate", "zinc citrate"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "copper",
+      "name": "Copper",
+      "aliases": ["copper sulfate", "copper gluconate", "cupric sulfate"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "manganese",
+      "name": "Manganese",
+      "aliases": ["manganese sulfate", "manganese gluconate"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "selenium",
+      "name": "Selenium",
+      "aliases": ["selenium dioxide", "sodium selenite", "selenomethionine"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "iodine",
+      "name": "Iodine",
+      "aliases": ["potassium iodide", "sodium iodide", "iodized"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "chromium",
+      "name": "Chromium",
+      "aliases": ["chromium picolinate", "chromium chloride"],
+      "category": "mineral",
+      "safe": true
+    },
+    {
+      "id": "biotin",
+      "name": "Biotin",
+      "aliases": ["vitamin b7", "vitamin h", "d-biotin"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "choline",
+      "name": "Choline",
+      "aliases": ["choline bitartrate", "choline chloride", "phosphatidylcholine"],
+      "category": "vitamin",
+      "safe": true
+    },
+    {
+      "id": "pectin",
+      "name": "Pectin",
+      "aliases": ["fruit pectin", "apple pectin", "citrus pectin", "e440"],
+      "category": "thickener",
+      "safe": true
+    },
+    {
+      "id": "agar",
+      "name": "Agar",
+      "aliases": ["agar agar", "e406"],
+      "category": "thickener",
+      "safe": true
+    },
+    {
+      "id": "guar_gum",
+      "name": "Guar Gum",
+      "aliases": ["e412", "guar"],
+      "category": "thickener",
+      "safe": true
+    },
+    {
+      "id": "locust_bean_gum",
+      "name": "Locust Bean Gum",
+      "aliases": ["carob bean gum", "e410"],
+      "category": "thickener",
+      "safe": true
+    },
+    {
+      "id": "cellulose",
+      "name": "Cellulose",
+      "aliases": ["cellulose gum", "microcrystalline cellulose", "methylcellulose", "carboxymethyl cellulose", "e460", "e461", "e466", "powdered cellulose"],
+      "category": "thickener",
+      "safe": true
+    },
+    {
+      "id": "lecithin",
+      "name": "Lecithin",
+      "aliases": ["soy lecithin", "sunflower lecithin", "e322"],
+      "category": "emulsifier",
+      "safe": true
+    },
+    {
+      "id": "mono_diglycerides",
+      "name": "Mono and Diglycerides",
+      "aliases": ["monoglycerides", "diglycerides", "mono- and diglycerides", "e471"],
+      "category": "emulsifier",
+      "safe": true
+    },
+    {
+      "id": "sorbitan",
+      "name": "Sorbitan Esters",
+      "aliases": ["sorbitan monostearate", "sorbitan tristearate", "e491", "e492"],
+      "category": "emulsifier",
+      "safe": true
+    },
+    {
+      "id": "annatto",
+      "name": "Annatto",
+      "aliases": ["annatto extract", "annatto color", "e160b", "achiote"],
+      "category": "coloring",
+      "safe": true
+    },
+    {
+      "id": "beta_carotene_color",
+      "name": "Beta Carotene (Color)",
+      "aliases": ["e160a", "carotene", "carrot color"],
+      "category": "coloring",
+      "safe": true
+    },
+    {
+      "id": "caramel_color",
+      "name": "Caramel Color",
+      "aliases": ["caramel", "e150a", "e150b", "e150c", "e150d", "caramel coloring"],
+      "category": "coloring",
+      "safe": true
+    },
+    {
+      "id": "turmeric_color",
+      "name": "Turmeric (Color)",
+      "aliases": ["turmeric extract", "turmeric oleoresin", "e100", "curcumin color"],
+      "category": "coloring",
+      "safe": true
+    },
+    {
+      "id": "paprika_color",
+      "name": "Paprika Oleoresin",
+      "aliases": ["paprika extract", "paprika color", "e160c"],
+      "category": "coloring",
+      "safe": true
+    },
+    {
+      "id": "beet_color",
+      "name": "Beet Juice (Color)",
+      "aliases": ["beet juice color", "beet powder", "beetroot red", "e162"],
+      "category": "coloring",
+      "safe": true
+    },
+    {
+      "id": "spirulina_color",
+      "name": "Spirulina Extract",
+      "aliases": ["spirulina blue", "phycocyanin"],
+      "category": "coloring",
+      "safe": true
+    },
+    {
+      "id": "chlorophyll",
+      "name": "Chlorophyll",
+      "aliases": ["chlorophyllin", "e140", "e141"],
+      "category": "coloring",
+      "safe": true
+    },
+    {
+      "id": "rice",
+      "name": "Rice",
+      "aliases": ["white rice", "brown rice", "jasmine rice", "basmati rice", "long grain rice", "short grain rice", "wild rice", "parboiled rice"],
+      "category": "grain",
+      "safe": true
+    },
+    {
+      "id": "barley",
+      "name": "Barley",
+      "aliases": ["pearl barley", "barley flour", "barley malt", "malt", "malted barley"],
+      "category": "grain",
+      "safe": true
+    },
+    {
+      "id": "quinoa",
+      "name": "Quinoa",
+      "aliases": ["quinoa flour"],
+      "category": "grain",
+      "safe": true
+    },
+    {
+      "id": "millet",
+      "name": "Millet",
+      "aliases": ["millet flour"],
+      "category": "grain",
+      "safe": true
+    },
+    {
+      "id": "buckwheat",
+      "name": "Buckwheat",
+      "aliases": ["buckwheat flour", "kasha"],
+      "category": "grain",
+      "safe": true
+    },
+    {
+      "id": "rye",
+      "name": "Rye",
+      "aliases": ["rye flour", "rye berries"],
+      "category": "grain",
+      "safe": true
+    },
+    {
+      "id": "spelt",
+      "name": "Spelt",
+      "aliases": ["spelt flour", "whole spelt", "farro"],
+      "category": "grain",
+      "safe": true
+    },
+    {
+      "id": "almonds",
+      "name": "Almonds",
+      "aliases": ["almond", "almond flour", "almond meal", "almond butter", "almond milk", "sliced almonds", "slivered almonds"],
+      "category": "nut",
+      "safe": true
+    },
+    {
+      "id": "peanuts",
+      "name": "Peanuts",
+      "aliases": ["peanut", "peanut butter", "peanut flour", "peanut oil", "ground peanuts", "roasted peanuts"],
+      "category": "nut",
+      "safe": true,
+      "note": "Safe unless allergic; research shows eating peanuts during pregnancy may reduce child's allergy risk"
+    },
+    {
+      "id": "walnuts",
+      "name": "Walnuts",
+      "aliases": ["walnut", "walnut pieces", "walnut halves"],
+      "category": "nut",
+      "safe": true
+    },
+    {
+      "id": "cashews",
+      "name": "Cashews",
+      "aliases": ["cashew", "cashew butter", "cashew milk"],
+      "category": "nut",
+      "safe": true
+    },
+    {
+      "id": "pecans",
+      "name": "Pecans",
+      "aliases": ["pecan", "pecan pieces"],
+      "category": "nut",
+      "safe": true
+    },
+    {
+      "id": "hazelnuts",
+      "name": "Hazelnuts",
+      "aliases": ["hazelnut", "filberts", "hazelnut butter"],
+      "category": "nut",
+      "safe": true
+    },
+    {
+      "id": "macadamia",
+      "name": "Macadamia Nuts",
+      "aliases": ["macadamia", "macadamia nut"],
+      "category": "nut",
+      "safe": true
+    },
+    {
+      "id": "pistachios",
+      "name": "Pistachios",
+      "aliases": ["pistachio", "pistachio nuts"],
+      "category": "nut",
+      "safe": true
+    },
+    {
+      "id": "sunflower_seeds",
+      "name": "Sunflower Seeds",
+      "aliases": ["sunflower seed", "sunflower kernels", "sunflower butter", "sunflower seed oil"],
+      "category": "seed",
+      "safe": true
+    },
+    {
+      "id": "pumpkin_seeds",
+      "name": "Pumpkin Seeds",
+      "aliases": ["pumpkin seed", "pepitas"],
+      "category": "seed",
+      "safe": true
+    },
+    {
+      "id": "flax_seeds",
+      "name": "Flax Seeds",
+      "aliases": ["flaxseed", "flax seed", "ground flax", "flaxseed meal", "linseed"],
+      "category": "seed",
+      "safe": true
+    },
+    {
+      "id": "chia_seeds",
+      "name": "Chia Seeds",
+      "aliases": ["chia", "chia seed"],
+      "category": "seed",
+      "safe": true
+    },
+    {
+      "id": "sesame_seeds",
+      "name": "Sesame Seeds",
+      "aliases": ["sesame", "sesame seed", "tahini", "sesame paste"],
+      "category": "seed",
+      "safe": true
+    },
+    {
+      "id": "hemp_seeds",
+      "name": "Hemp Seeds",
+      "aliases": ["hemp seed", "hemp hearts", "hulled hemp seeds"],
+      "category": "seed",
+      "safe": true
+    },
+    {
+      "id": "poppy_seeds",
+      "name": "Poppy Seeds",
+      "aliases": ["poppy seed"],
+      "category": "seed",
+      "safe": true
+    },
+    {
+      "id": "soy_sauce",
+      "name": "Soy Sauce",
+      "aliases": ["shoyu", "tamari", "liquid aminos", "soya sauce"],
+      "category": "condiment",
+      "safe": true
+    },
+    {
+      "id": "worcestershire",
+      "name": "Worcestershire Sauce",
+      "aliases": ["worcestershire"],
+      "category": "condiment",
+      "safe": true
+    },
+    {
+      "id": "hot_sauce",
+      "name": "Hot Sauce",
+      "aliases": ["hot pepper sauce", "chili sauce", "sriracha", "tabasco"],
+      "category": "condiment",
+      "safe": true
+    },
+    {
+      "id": "ketchup",
+      "name": "Ketchup",
+      "aliases": ["catsup", "tomato ketchup"],
+      "category": "condiment",
+      "safe": true
+    },
+    {
+      "id": "mayonnaise",
+      "name": "Mayonnaise",
+      "aliases": ["mayo"],
+      "category": "condiment",
+      "safe": true,
+      "note": "Commercial mayo uses pasteurized eggs; safe during pregnancy"
+    },
+    {
+      "id": "dextrose",
+      "name": "Dextrose",
+      "aliases": ["glucose", "corn sugar", "grape sugar", "d-glucose"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "maltodextrin",
+      "name": "Maltodextrin",
+      "aliases": [],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "invert_sugar",
+      "name": "Invert Sugar",
+      "aliases": ["inverted sugar", "invert syrup"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "corn_syrup",
+      "name": "Corn Syrup",
+      "aliases": ["light corn syrup", "dark corn syrup", "glucose syrup"],
+      "category": "sweetener",
+      "safe": true,
+      "note": "Different from high fructose corn syrup"
+    },
+    {
+      "id": "rice_syrup",
+      "name": "Rice Syrup",
+      "aliases": ["brown rice syrup", "rice malt syrup"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "fruit_juice_concentrate",
+      "name": "Fruit Juice Concentrate",
+      "aliases": ["apple juice concentrate", "grape juice concentrate", "pear juice concentrate", "concentrated fruit juice", "juice concentrate"],
+      "category": "sweetener",
+      "safe": true
+    },
+    {
+      "id": "erythritol",
+      "name": "Erythritol",
+      "aliases": ["e968"],
+      "category": "sugar_alcohol",
+      "safe": true
+    },
+    {
+      "id": "sorbitol",
+      "name": "Sorbitol",
+      "aliases": ["e420"],
+      "category": "sugar_alcohol",
+      "safe": true,
+      "note": "May cause digestive discomfort in large amounts"
+    },
+    {
+      "id": "mannitol",
+      "name": "Mannitol",
+      "aliases": ["e421"],
+      "category": "sugar_alcohol",
+      "safe": true
+    },
+    {
+      "id": "xylitol",
+      "name": "Xylitol",
+      "aliases": ["e967", "birch sugar"],
+      "category": "sugar_alcohol",
+      "safe": true
+    },
+    {
+      "id": "isomalt",
+      "name": "Isomalt",
+      "aliases": ["e953"],
+      "category": "sugar_alcohol",
+      "safe": true
+    },
+    {
+      "id": "maltitol",
+      "name": "Maltitol",
+      "aliases": ["e965", "maltitol syrup"],
+      "category": "sugar_alcohol",
+      "safe": true
+    },
+    {
+      "id": "smoke_flavor",
+      "name": "Smoke Flavor",
+      "aliases": ["natural smoke flavor", "natural smoke flavoring", "liquid smoke", "hickory smoke flavor"],
+      "category": "flavoring",
+      "safe": true
+    },
+    {
+      "id": "enzymes",
+      "name": "Enzymes",
+      "aliases": ["enzyme", "rennet", "lipase", "protease", "amylase", "lactase", "microbial enzymes"],
+      "category": "processing_aid",
+      "safe": true
+    },
+    {
+      "id": "culture",
+      "name": "Cultures",
+      "aliases": ["live cultures", "active cultures", "probiotic cultures", "lactobacillus", "bifidobacterium", "streptococcus thermophilus"],
+      "category": "processing_aid",
+      "safe": true
+    },
+    {
+      "id": "inulin",
+      "name": "Inulin",
+      "aliases": ["chicory root fiber", "chicory root extract", "chicory fiber"],
+      "category": "fiber",
+      "safe": true
+    },
+    {
+      "id": "psyllium",
+      "name": "Psyllium",
+      "aliases": ["psyllium husk", "psyllium fiber", "ispaghula"],
+      "category": "fiber",
+      "safe": true
+    },
+    {
+      "id": "oat_fiber",
+      "name": "Oat Fiber",
+      "aliases": ["oat bran", "oat hull fiber"],
+      "category": "fiber",
+      "safe": true
+    },
+    {
+      "id": "wheat_fiber",
+      "name": "Wheat Fiber",
+      "aliases": ["wheat bran", "wheat germ"],
+      "category": "fiber",
+      "safe": true
+    },
+    {
+      "id": "soluble_corn_fiber",
+      "name": "Soluble Corn Fiber",
+      "aliases": ["resistant maltodextrin", "corn fiber"],
+      "category": "fiber",
+      "safe": true
+    }
+  ]
+}

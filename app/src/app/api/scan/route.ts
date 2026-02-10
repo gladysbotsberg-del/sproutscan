@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import ingredientsDB from '@/data/ingredients.json';
+import concerningIngredientsDB from '@/data/ingredients.json';
+import safeIngredientsDB from '@/data/ingredients-safe.json';
 
-interface Ingredient {
+interface ConcerningIngredient {
   id: string;
   name: string;
   aliases: string[];
@@ -19,9 +20,13 @@ interface Ingredient {
   sources: string[];
 }
 
-interface IngredientsDB {
-  metadata: any;
-  ingredients: Ingredient[];
+interface SafeIngredient {
+  id: string;
+  name: string;
+  aliases: string[];
+  category: string;
+  safe: boolean;
+  note?: string;
 }
 
 interface ProductData {
@@ -38,7 +43,6 @@ async function searchUSDA(barcode: string): Promise<ProductData | null> {
   try {
     console.log(`[MamaSense] USDA: Searching for ${barcode}`);
     
-    // Try direct barcode search
     const response = await fetch(
       `https://api.nal.usda.gov/fdc/v1/foods/search?query=${barcode}&dataType=Branded&pageSize=10&api_key=DEMO_KEY`,
       { next: { revalidate: 3600 } }
@@ -53,7 +57,6 @@ async function searchUSDA(barcode: string): Promise<ProductData | null> {
     console.log(`[MamaSense] USDA: Found ${data.foods?.length || 0} results`);
     
     if (data.foods && data.foods.length > 0) {
-      // Try to find exact barcode match first
       const exactMatch = data.foods.find((f: any) => {
         const upc = f.gtinUpc || '';
         const cleanUpc = upc.replace(/^0+/, '');
@@ -125,7 +128,7 @@ async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null>
   }
 }
 
-// UPCitemdb API - FALLBACK 2 (product ID only, usually no ingredients)
+// UPCitemdb API - FALLBACK 2
 async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
   try {
     console.log(`[MamaSense] UPCitemdb: Searching for ${barcode}`);
@@ -152,7 +155,7 @@ async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
         name: item.title || 'Unknown Product',
         brand: item.brand || '',
         image: item.images?.[0] || null,
-        ingredients: [], // UPCitemdb doesn't have ingredients
+        ingredients: [],
         barcode: barcode,
         source: 'UPCitemdb'
       };
@@ -188,17 +191,15 @@ export async function GET(request: NextRequest) {
       sources.push('USDA');
     }
     
-    // 2. FALLBACK 1: Open Food Facts (if USDA didn't have it or no ingredients)
+    // 2. FALLBACK 1: Open Food Facts
     if (!productData || productData.ingredients.length === 0) {
       const offData = await searchOpenFoodFacts(cleanBarcode);
       
       if (offData) {
         if (!productData) {
-          // USDA had nothing, use OFF entirely
           productData = offData;
           sources.push('OpenFoodFacts');
         } else if (offData.ingredients.length > 0 && productData.ingredients.length === 0) {
-          // USDA had product but no ingredients, OFF has ingredients - merge
           productData.ingredients = offData.ingredients;
           sources.push('OpenFoodFacts');
           if (offData.image && !productData.image) {
@@ -208,7 +209,7 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // 3. FALLBACK 2: UPCitemdb (last resort for product identification)
+    // 3. FALLBACK 2: UPCitemdb
     if (!productData) {
       productData = await searchUPCitemdb(cleanBarcode);
       if (productData) {
@@ -216,14 +217,13 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // Update source string
     if (productData && sources.length > 0) {
       productData.source = sources.join(' + ');
     }
     
     console.log(`[MamaSense] Final result: ${productData ? productData.name : 'NOT FOUND'}, sources: ${sources.join(', ')}`);
     
-    // 4. Not found anywhere
+    // Not found
     if (!productData) {
       return NextResponse.json({
         error: 'Product not found',
@@ -232,7 +232,7 @@ export async function GET(request: NextRequest) {
       }, { status: 404 });
     }
     
-    // 5. Found product but no ingredients
+    // No ingredients
     if (productData.ingredients.length === 0) {
       return NextResponse.json({
         product: productData,
@@ -245,7 +245,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 6. Analyze ingredients for pregnancy safety
+    // Analyze ingredients
     const safetyResult = analyzeIngredients(productData.ingredients, trimester);
 
     return NextResponse.json({
@@ -282,7 +282,8 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
   const safeIngredients: string[] = [];
   const unknownIngredients: string[] = [];
 
-  const db = ingredientsDB as IngredientsDB;
+  const concerningDB = (concerningIngredientsDB as any).ingredients as ConcerningIngredient[];
+  const safeDB = (safeIngredientsDB as any).safeIngredients as SafeIngredient[];
   
   const trimesterKey = trimester === 1 
     ? 'firstTrimester' 
@@ -291,34 +292,46 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
       : 'thirdTrimester';
 
   for (const ingredient of ingredients) {
-    const match = findIngredientMatch(ingredient, db.ingredients);
+    // First check if it's a concerning ingredient
+    const concerningMatch = findConcerningMatch(ingredient, concerningDB);
     
-    if (match) {
-      const safety = match.safetyRating[trimesterKey];
+    if (concerningMatch) {
+      const safety = concerningMatch.safetyRating[trimesterKey];
       
       if (safety === 'avoid') {
         flaggedIngredients.push({
-          name: match.name,
+          name: concerningMatch.name,
           rating: 'avoid',
-          concern: match.concerns.join(' '),
-          explanation: match.description + ' ' + match.function,
-          bottomLine: match.bottomLine,
+          concern: concerningMatch.concerns.join(' '),
+          explanation: concerningMatch.description + ' ' + concerningMatch.function,
+          bottomLine: concerningMatch.bottomLine,
         });
       } else if (safety === 'caution') {
         flaggedIngredients.push({
-          name: match.name,
+          name: concerningMatch.name,
           rating: 'caution',
-          concern: match.concerns.join(' '),
-          explanation: match.description + ' ' + match.function,
-          bottomLine: match.bottomLine,
+          concern: concerningMatch.concerns.join(' '),
+          explanation: concerningMatch.description + ' ' + concerningMatch.function,
+          bottomLine: concerningMatch.bottomLine,
         });
       } else {
-        safeIngredients.push(match.name);
+        // It's in the concerning DB but rated safe
+        safeIngredients.push(concerningMatch.name);
       }
-    } else {
-      if (ingredient.length > 2) {
-        unknownIngredients.push(ingredient);
-      }
+      continue;
+    }
+    
+    // Then check if it's a known safe ingredient
+    const safeMatch = findSafeMatch(ingredient, safeDB);
+    
+    if (safeMatch) {
+      safeIngredients.push(safeMatch.name);
+      continue;
+    }
+    
+    // Unknown ingredient
+    if (ingredient.length > 2) {
+      unknownIngredients.push(ingredient);
     }
   }
 
@@ -329,6 +342,9 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
     overallSafety = 'caution';
   }
 
+  // Log analysis summary
+  console.log(`[MamaSense] Analysis: ${safeIngredients.length} safe, ${flaggedIngredients.length} flagged, ${unknownIngredients.length} unknown`);
+
   return {
     overallSafety,
     flaggedIngredients,
@@ -337,14 +353,16 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
   };
 }
 
-function findIngredientMatch(ingredientName: string, ingredients: Ingredient[]): Ingredient | null {
+function findConcerningMatch(ingredientName: string, ingredients: ConcerningIngredient[]): ConcerningIngredient | null {
   const normalized = ingredientName.toLowerCase().trim();
   
   for (const ingredient of ingredients) {
+    // Exact name match
     if (ingredient.name.toLowerCase() === normalized) {
       return ingredient;
     }
     
+    // Alias match
     for (const alias of ingredient.aliases) {
       const aliasLower = alias.toLowerCase();
       if (aliasLower === normalized || normalized.includes(aliasLower)) {
@@ -352,7 +370,39 @@ function findIngredientMatch(ingredientName: string, ingredients: Ingredient[]):
       }
     }
     
+    // Partial name match
     if (normalized.includes(ingredient.name.toLowerCase())) {
+      return ingredient;
+    }
+  }
+  
+  return null;
+}
+
+function findSafeMatch(ingredientName: string, ingredients: SafeIngredient[]): SafeIngredient | null {
+  const normalized = ingredientName.toLowerCase().trim();
+  
+  for (const ingredient of ingredients) {
+    // Exact name match
+    if (ingredient.name.toLowerCase() === normalized) {
+      return ingredient;
+    }
+    
+    // Alias match
+    for (const alias of ingredient.aliases) {
+      const aliasLower = alias.toLowerCase();
+      if (aliasLower === normalized || normalized === aliasLower) {
+        return ingredient;
+      }
+      // Check if the ingredient contains the alias (but alias must be > 3 chars to avoid false positives)
+      if (aliasLower.length > 3 && normalized.includes(aliasLower)) {
+        return ingredient;
+      }
+    }
+    
+    // Check if ingredient name is contained in the search term (for things like "enriched wheat flour")
+    const nameLower = ingredient.name.toLowerCase();
+    if (nameLower.length > 3 && normalized.includes(nameLower)) {
       return ingredient;
     }
   }
