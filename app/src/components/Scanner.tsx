@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Html5Qrcode } from 'html5-qrcode';
+import Quagga from '@ericblade/quagga2';
 
 interface ScannerProps {
   onScan: (barcode: string) => void;
@@ -15,14 +15,15 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   
-  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scannerRef = useRef<HTMLDivElement>(null);
   const isRunningRef = useRef(false);
   const mountedRef = useRef(true);
+  const lastScannedRef = useRef<string | null>(null);
 
-  const stopScanner = useCallback(async () => {
-    if (scannerRef.current && isRunningRef.current) {
+  const stopScanner = useCallback(() => {
+    if (isRunningRef.current) {
       try {
-        await scannerRef.current.stop();
+        Quagga.stop();
       } catch (err) {
         // Ignore - scanner may already be stopped
       }
@@ -32,10 +33,10 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
 
   useEffect(() => {
     mountedRef.current = true;
-    let html5QrCode: Html5Qrcode | null = null;
+    lastScannedRef.current = null;
     
     const startScanner = async () => {
-      if (manualEntry) {
+      if (manualEntry || !scannerRef.current) {
         setIsInitializing(false);
         return;
       }
@@ -44,43 +45,73 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
       setError(null);
 
       // Wait for DOM
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       if (!mountedRef.current) return;
 
-      const containerId = 'scanner-video-container';
-      const container = document.getElementById(containerId);
-      
-      if (!container) {
-        setError('Scanner container not found');
-        setIsInitializing(false);
-        return;
-      }
-
       try {
-        html5QrCode = new Html5Qrcode(containerId);
-        scannerRef.current = html5QrCode;
+        await new Promise<void>((resolve, reject) => {
+          Quagga.init({
+            inputStream: {
+              name: 'Live',
+              type: 'LiveStream',
+              target: scannerRef.current!,
+              constraints: {
+                facingMode: 'environment',
+                width: { min: 640, ideal: 1280, max: 1920 },
+                height: { min: 480, ideal: 720, max: 1080 },
+              },
+            },
+            locator: {
+              patchSize: 'medium',
+              halfSample: true,
+            },
+            numOfWorkers: navigator.hardwareConcurrency || 4,
+            frequency: 10,
+            decoder: {
+              readers: [
+                'upc_reader',
+                'upc_e_reader',
+                'ean_reader',
+                'ean_8_reader',
+                'code_128_reader',
+                'code_39_reader',
+              ],
+            },
+            locate: true,
+          }, (err) => {
+            if (err) {
+              reject(err);
+              return;
+            }
+            resolve();
+          });
+        });
 
-        const config = {
-          fps: 10,
-          qrbox: 250
-        };
+        if (!mountedRef.current) {
+          Quagga.stop();
+          return;
+        }
 
-        await html5QrCode.start(
-          { facingMode: 'environment' },
-          config,
-          async (decodedText) => {
-            if (!mountedRef.current) return;
-            await stopScanner();
-            onScan(decodedText);
-          },
-          () => {
-            // Scan error - ignore, keep trying
-          }
-        );
-
+        Quagga.start();
         isRunningRef.current = true;
-        
+
+        // Handle successful scans
+        Quagga.onDetected((result) => {
+          if (!mountedRef.current) return;
+          
+          const code = result.codeResult?.code;
+          if (!code) return;
+          
+          // Debounce: ignore if same code scanned within 1 second
+          if (lastScannedRef.current === code) return;
+          lastScannedRef.current = code;
+          
+          // Stop scanner and report result
+          stopScanner();
+          onScan(code);
+        });
+
         if (mountedRef.current) {
           setHasPermission(true);
           setIsInitializing(false);
@@ -95,7 +126,7 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
           const msg = err?.message || String(err);
           if (msg.includes('Permission') || msg.includes('NotAllowed')) {
             setError('Camera permission denied. Tap "Enter Manually" below.');
-          } else if (msg.includes('NotFound')) {
+          } else if (msg.includes('NotFound') || msg.includes('not found')) {
             setError('No camera found. Tap "Enter Manually" below.');
           } else {
             setError('Could not start camera. Tap "Enter Manually" below.');
@@ -108,10 +139,8 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
 
     return () => {
       mountedRef.current = false;
-      if (html5QrCode && isRunningRef.current) {
-        html5QrCode.stop().catch(() => {});
-        isRunningRef.current = false;
-      }
+      Quagga.offDetected();
+      stopScanner();
     };
   }, [manualEntry, onScan, stopScanner]);
 
@@ -123,14 +152,14 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
     }
   };
 
-  const handleClose = async () => {
-    await stopScanner();
+  const handleClose = () => {
+    stopScanner();
     onClose();
   };
 
-  const toggleManualEntry = async () => {
+  const toggleManualEntry = () => {
     if (!manualEntry) {
-      await stopScanner();
+      stopScanner();
     }
     setManualEntry(!manualEntry);
   };
@@ -162,17 +191,17 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
             )}
             
             <div 
-              id="scanner-video-container"
-              className="w-full max-w-md bg-gray-900 rounded-lg overflow-hidden"
+              ref={scannerRef}
+              className="w-full max-w-lg bg-gray-900 rounded-lg overflow-hidden relative"
               style={{ 
-                height: '300px',
+                height: '350px',
                 display: isInitializing ? 'none' : 'block'
               }}
             />
 
             {!isInitializing && hasPermission && (
               <p className="text-gray-400 text-sm mt-4 text-center">
-                Point camera at barcode
+                Point camera at barcode — it will scan automatically
               </p>
             )}
             
