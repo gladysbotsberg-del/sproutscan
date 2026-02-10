@@ -1,0 +1,676 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-09",
+    "description": "BellyCheck Pregnancy-Safe Ingredient Database",
+    "disclaimer": "This database is for informational purposes only and should not replace medical advice. Always consult your healthcare provider.",
+    "sources": [
+      "U.S. Food and Drug Administration (FDA)",
+      "American Pregnancy Association",
+      "March of Dimes",
+      "American College of Obstetricians and Gynecologists (ACOG)",
+      "World Health Organization (WHO)",
+      "National Institutes of Health (NIH/PubMed)",
+      "European Food Safety Authority (EFSA)"
+    ]
+  },
+  "ingredients": [
+    {
+      "id": "aspartame",
+      "name": "Aspartame",
+      "aliases": ["Equal", "NutraSweet", "Sugar Twin", "E951", "APM"],
+      "category": "artificial_sweetener",
+      "description": "An artificial sweetener made from two amino acids (phenylalanine and aspartic acid) that is about 200 times sweeter than sugar.",
+      "function": "Non-nutritive sweetener used in diet sodas, sugar-free gum, yogurt, breakfast cereals, and tabletop sweeteners.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Contains phenylalanine - dangerous for people with PKU (phenylketonuria)",
+        "Limited data on high consumption during pregnancy",
+        "IARC classified as 'possibly carcinogenic' in 2023, though FDA disagrees"
+      ],
+      "safetyNotes": "FDA considers safe for general population including pregnant women when used in moderation. However, avoid if you have PKU or high phenylalanine blood levels. ACOG has no restrictions but recommends moderation.",
+      "bottomLine": "Generally considered safe in moderation, but limit intake; absolutely avoid if you have PKU.",
+      "sources": [
+        "FDA - Aspartame and Other Sweeteners in Food",
+        "American Pregnancy Association - Artificial Sweeteners and Pregnancy"
+      ]
+    },
+    {
+      "id": "sucralose",
+      "name": "Sucralose",
+      "aliases": ["Splenda", "E955", "1,6-dichloro-1,6-dideoxyfructose"],
+      "category": "artificial_sweetener",
+      "description": "An artificial sweetener made from sugar that is about 600 times sweeter than table sugar and contains no calories.",
+      "function": "Non-caloric sweetener used in baked goods, beverages, chewing gum, frozen desserts, and as a tabletop sweetener.",
+      "safetyRating": {
+        "firstTrimester": "safe",
+        "secondTrimester": "safe",
+        "thirdTrimester": "safe"
+      },
+      "concerns": [
+        "Some animal studies suggest potential effects on gut microbiome",
+        "Heat stability means it can be used in cooking/baking"
+      ],
+      "safetyNotes": "FDA has approved sucralose as safe for everyone, including pregnant women. Over 110 safety studies reviewed. Does not affect blood sugar levels.",
+      "bottomLine": "Considered safe during pregnancy; one of the better-studied artificial sweeteners.",
+      "sources": [
+        "FDA - Food Additives",
+        "American Pregnancy Association"
+      ]
+    },
+    {
+      "id": "saccharin",
+      "name": "Saccharin",
+      "aliases": ["Sweet'N Low", "Sweet Twin", "Necta Sweet", "E954"],
+      "category": "artificial_sweetener",
+      "description": "The oldest artificial sweetener, discovered in 1879, that is 200-700 times sweeter than sugar and contains no calories.",
+      "function": "Non-nutritive sweetener used in beverages, tabletop sweeteners, and some processed foods.",
+      "safetyRating": {
+        "firstTrimester": "avoid",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Crosses the placenta and may remain in fetal tissue",
+        "Historical concerns about bladder cancer (later dismissed for general population)",
+        "Less well-studied during pregnancy than other sweeteners"
+      ],
+      "safetyNotes": "While FDA considers saccharin safe for the general public, studies show it crosses the placenta and can accumulate in fetal tissue. American Pregnancy Association lists this as questionable for use during pregnancy.",
+      "bottomLine": "Best to avoid during pregnancy, especially first trimester; choose other sweeteners instead.",
+      "sources": [
+        "American Pregnancy Association",
+        "FDA - Saccharin food additive status"
+      ]
+    },
+    {
+      "id": "caffeine",
+      "name": "Caffeine",
+      "aliases": ["1,3,7-trimethylxanthine", "coffee", "guarana", "mate"],
+      "category": "stimulant",
+      "description": "A natural stimulant found in coffee, tea, chocolate, and some medications that can increase alertness and heart rate.",
+      "function": "Stimulant naturally present in beverages and added to some foods, medications, and energy drinks for alertness.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Crosses the placenta - baby cannot metabolize caffeine efficiently",
+        "High intake (>200mg/day) linked to increased miscarriage risk",
+        "May affect fetal heart rate and movement patterns",
+        "Increases blood pressure and heart rate",
+        "Diuretic effect can contribute to dehydration"
+      ],
+      "safetyNotes": "ACOG and March of Dimes recommend limiting to less than 200mg per day during pregnancy. One 12oz cup of coffee has approximately 95-165mg. Body processes caffeine more slowly during pregnancy.",
+      "recommendedLimit": "Less than 200mg per day",
+      "commonAmounts": {
+        "brewed_coffee_8oz": "95-165mg",
+        "espresso_1oz": "47-64mg",
+        "black_tea_8oz": "45mg",
+        "green_tea_8oz": "40mg",
+        "cola_12oz": "35-45mg",
+        "dark_chocolate_1oz": "12mg"
+      },
+      "bottomLine": "Limit to under 200mg daily (about one 12oz coffee); consider cutting back further in first trimester.",
+      "sources": [
+        "American Pregnancy Association - Caffeine During Pregnancy",
+        "March of Dimes - Caffeine in Pregnancy",
+        "ACOG Committee Opinion"
+      ]
+    },
+    {
+      "id": "high_fructose_corn_syrup",
+      "name": "High Fructose Corn Syrup",
+      "aliases": ["HFCS", "corn syrup", "glucose-fructose syrup", "isoglucose", "HFCS-55", "HFCS-42"],
+      "category": "nutritive_sweetener",
+      "description": "A liquid sweetener made from corn starch that contains varying amounts of fructose and glucose, commonly used as a cheaper alternative to sugar.",
+      "function": "Sweetener and preservative used in sodas, baked goods, cereals, condiments, and many processed foods.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "High sugar intake linked to excessive weight gain during pregnancy",
+        "May increase risk of gestational diabetes",
+        "Associated with increased inflammation",
+        "Provides empty calories with no nutritional value",
+        "Ubiquitous in processed foods - easy to overconsume"
+      ],
+      "safetyNotes": "While not inherently dangerous, HFCS contributes to excess sugar intake which can lead to pregnancy complications including gestational diabetes and excessive weight gain. The concern is about quantity rather than the ingredient itself.",
+      "bottomLine": "Not toxic but limit intake; excessive sugar during pregnancy increases health risks.",
+      "sources": [
+        "FDA - High Fructose Corn Syrup Questions and Answers",
+        "American Diabetes Association"
+      ]
+    },
+    {
+      "id": "sodium_nitrate_nitrite",
+      "name": "Sodium Nitrate/Nitrite",
+      "aliases": ["E250", "E251", "curing salt", "Prague powder", "nitrate", "nitrite"],
+      "category": "preservative",
+      "description": "Chemical compounds used to preserve meat, prevent bacterial growth, and give cured meats their pink color.",
+      "function": "Preservative and color fixative used in bacon, hot dogs, deli meats, ham, and other cured/processed meats.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Can form nitrosamines (potential carcinogens) when heated at high temperatures",
+        "Some studies link nitrate exposure to certain birth defects (neural tube defects)",
+        "Found in processed meats which also carry listeria risk",
+        "WHO classifies processed meats as Group 1 carcinogen"
+      ],
+      "safetyNotes": "The concern during pregnancy relates to both the nitrates themselves and the processed meats that contain them. Processed meats should be heated until steaming to kill listeria. Limit consumption of processed/cured meats.",
+      "bottomLine": "Limit processed meats; if eating, heat thoroughly. Occasional consumption unlikely to cause harm.",
+      "sources": [
+        "WHO - Q&A on carcinogenicity of processed meat",
+        "American Cancer Society"
+      ]
+    },
+    {
+      "id": "bha",
+      "name": "BHA (Butylated Hydroxyanisole)",
+      "aliases": ["E320", "butylated hydroxyanisole", "antioxidant BHA"],
+      "category": "preservative",
+      "description": "A synthetic antioxidant used to prevent fats and oils from going rancid in food products.",
+      "function": "Antioxidant preservative used in cereals, chewing gum, potato chips, vegetable oils, and baked goods.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Classified as 'reasonably anticipated to be a human carcinogen' by NTP",
+        "May be an endocrine disruptor",
+        "Some animal studies show reproductive effects",
+        "Banned or restricted in some countries"
+      ],
+      "safetyNotes": "While FDA allows BHA in foods at current levels, some health organizations have raised concerns about potential carcinogenicity and hormone disruption. Limited human pregnancy data available. European authorities have set stricter limits.",
+      "bottomLine": "Minimize exposure when possible; choose products without BHA, especially in first trimester.",
+      "sources": [
+        "National Toxicology Program - 14th Report on Carcinogens",
+        "FDA - Food Additives Status List"
+      ]
+    },
+    {
+      "id": "bht",
+      "name": "BHT (Butylated Hydroxytoluene)",
+      "aliases": ["E321", "butylated hydroxytoluene", "antioxidant BHT"],
+      "category": "preservative",
+      "description": "A synthetic antioxidant chemically similar to BHA, used to prevent oxidation and extend shelf life.",
+      "function": "Antioxidant preservative used in cereals, chewing gum, snack foods, and fats/oils to prevent rancidity.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Limited studies on effects during pregnancy",
+        "Some animal studies suggest potential tumor promotion",
+        "May affect liver and kidney function at high doses",
+        "Banned in some countries as food additive"
+      ],
+      "safetyNotes": "FDA considers BHT safe at current allowed levels. Less concerning than BHA according to most assessments, but limited pregnancy-specific data exists. Often used in combination with BHA.",
+      "bottomLine": "Probably safe in small amounts; minimize exposure when alternatives exist.",
+      "sources": [
+        "FDA - Food Additives Status List",
+        "EFSA - Scientific Opinion on BHT"
+      ]
+    },
+    {
+      "id": "red_40",
+      "name": "Red 40",
+      "aliases": ["Allura Red", "Allura Red AC", "E129", "FD&C Red No. 40", "CI 16035"],
+      "category": "food_coloring",
+      "description": "A synthetic red azo dye that is the most commonly used food coloring in the United States.",
+      "function": "Provides red color to candies, cereals, beverages, desserts, and many processed foods.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Some studies link to hyperactivity in children",
+        "May cause allergic reactions in sensitive individuals",
+        "Contains benzidine, a known carcinogen (though in very small amounts)",
+        "No nutritional value - purely cosmetic",
+        "European products require warning labels"
+      ],
+      "safetyNotes": "FDA considers Red 40 safe at current levels. However, some studies have raised concerns about behavioral effects and potential contaminants. Provides no nutritional benefit. California passed a law requiring warning labels on foods containing Red 40 for children.",
+      "bottomLine": "Not essential; consider avoiding when possible. Unlikely to cause harm in typical amounts but offers no benefit.",
+      "sources": [
+        "FDA - Color Additives History",
+        "Center for Science in the Public Interest"
+      ]
+    },
+    {
+      "id": "yellow_5",
+      "name": "Yellow 5",
+      "aliases": ["Tartrazine", "E102", "FD&C Yellow No. 5", "CI 19140"],
+      "category": "food_coloring",
+      "description": "A synthetic lemon-yellow azo dye commonly used in food, cosmetics, and medications.",
+      "function": "Provides yellow color to candies, soft drinks, cereals, pickles, mustard, and many processed foods.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Associated with hyperactivity in some children",
+        "Can cause allergic reactions, especially in aspirin-sensitive individuals",
+        "May cause hives, asthma symptoms in sensitive people",
+        "Requires warning on labels if present (FDA)",
+        "No nutritional value"
+      ],
+      "safetyNotes": "FDA requires Yellow 5 to be specifically listed on food labels due to potential allergic reactions. While considered safe for most people, some individuals are sensitive to it. Limited specific data on pregnancy effects.",
+      "bottomLine": "Generally safe but unnecessary; avoid if you have aspirin sensitivity or allergies to dyes.",
+      "sources": [
+        "FDA - Color Additives",
+        "American Academy of Allergy, Asthma & Immunology"
+      ]
+    },
+    {
+      "id": "msg",
+      "name": "MSG (Monosodium Glutamate)",
+      "aliases": ["E621", "monosodium glutamate", "glutamate", "Ajinomoto", "Accent"],
+      "category": "flavor_enhancer",
+      "description": "The sodium salt of glutamic acid, an amino acid naturally found in many foods like tomatoes and cheese that enhances savory (umami) flavor.",
+      "function": "Flavor enhancer used in soups, sauces, snacks, processed foods, and restaurant cooking to boost savory taste.",
+      "safetyRating": {
+        "firstTrimester": "safe",
+        "secondTrimester": "safe",
+        "thirdTrimester": "safe"
+      },
+      "concerns": [
+        "Some people report sensitivity (headache, flushing) though not confirmed in studies",
+        "High sodium content",
+        "Body processes it same as naturally occurring glutamate"
+      ],
+      "safetyNotes": "FDA classifies MSG as 'Generally Recognized as Safe' (GRAS). Glutamate is naturally present in many foods and our bodies. Scientific studies have not been able to consistently trigger reactions even in self-identified sensitive individuals. No evidence of harm during pregnancy at normal consumption levels.",
+      "bottomLine": "Considered safe during pregnancy; sensitivity reactions are not scientifically confirmed.",
+      "sources": [
+        "FDA - Questions and Answers on MSG",
+        "FASEB Report on MSG Safety"
+      ]
+    },
+    {
+      "id": "carrageenan",
+      "name": "Carrageenan",
+      "aliases": ["E407", "Irish moss extract", "chondrus extract"],
+      "category": "thickener_emulsifier",
+      "description": "A family of natural polysaccharides extracted from red seaweed, used as a thickener and stabilizer in food.",
+      "function": "Thickener and emulsifier used in dairy products, non-dairy milks, deli meats, infant formula, and ice cream.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Animal studies show it can cause intestinal inflammation",
+        "May disrupt gut microbiome",
+        "Some research links to digestive issues",
+        "Degraded carrageenan (poligeenan) is more concerning than food-grade"
+      ],
+      "safetyNotes": "FDA considers food-grade carrageenan safe. However, some research suggests it may cause gastrointestinal inflammation. The National Organic Standards Board recommended removing it from organic foods. Limited pregnancy-specific studies exist.",
+      "bottomLine": "Probably safe in typical amounts but consider limiting if you have digestive sensitivities.",
+      "sources": [
+        "FDA - Food Additives Status",
+        "NIH/PubMed - Carrageenan and Intestinal Inflammation Studies"
+      ]
+    },
+    {
+      "id": "polysorbate_80",
+      "name": "Polysorbate 80",
+      "aliases": ["E433", "Tween 80", "polyoxyethylene sorbitan monooleate"],
+      "category": "emulsifier",
+      "description": "A synthetic emulsifier made from sorbitol and oleic acid used to keep ingredients mixed together.",
+      "function": "Emulsifier used in ice cream, salad dressings, sauces, baked goods, and many processed foods.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Animal studies suggest potential effects on gut microbiome",
+        "May increase intestinal permeability ('leaky gut')",
+        "Some research links emulsifiers to metabolic disorders",
+        "Also used in vaccines and medications (different context)"
+      ],
+      "safetyNotes": "FDA considers polysorbate 80 safe for food use. However, recent research on food emulsifiers suggests they may affect gut health. Limited human pregnancy studies available. Used widely in processed foods.",
+      "bottomLine": "Limited data in pregnancy; minimize processed food intake to reduce exposure.",
+      "sources": [
+        "FDA - Food Additives Status",
+        "NIH - Emulsifiers and Gut Health Research"
+      ]
+    },
+    {
+      "id": "xanthan_gum",
+      "name": "Xanthan Gum",
+      "aliases": ["E415", "xanthan", "corn sugar gum"],
+      "category": "thickener_stabilizer",
+      "description": "A natural polysaccharide produced by bacterial fermentation, used as a thickener and stabilizer in food.",
+      "function": "Thickener and stabilizer used in salad dressings, sauces, gluten-free baking, and many processed foods.",
+      "safetyRating": {
+        "firstTrimester": "safe",
+        "secondTrimester": "safe",
+        "thirdTrimester": "safe"
+      },
+      "concerns": [
+        "May cause digestive discomfort in large amounts",
+        "Can have laxative effect in high doses",
+        "Rarely, may cause allergic reactions"
+      ],
+      "safetyNotes": "FDA classifies xanthan gum as GRAS (Generally Recognized as Safe). Widely used and well-studied. No specific concerns during pregnancy at typical food consumption levels. Important ingredient in gluten-free cooking.",
+      "bottomLine": "Considered safe during pregnancy in normal food amounts.",
+      "sources": [
+        "FDA - GRAS Substances",
+        "EFSA - Scientific Opinion on Xanthan Gum"
+      ]
+    },
+    {
+      "id": "stevia",
+      "name": "Stevia",
+      "aliases": ["Rebaudioside A", "Reb A", "steviol glycosides", "E960", "Truvia", "PureVia", "stevia leaf extract"],
+      "category": "natural_sweetener",
+      "description": "A natural sweetener extracted from the leaves of the Stevia rebaudiana plant, up to 300 times sweeter than sugar.",
+      "function": "Non-caloric natural sweetener used in beverages, tabletop sweeteners, and reduced-sugar products.",
+      "safetyRating": {
+        "firstTrimester": "safe",
+        "secondTrimester": "safe",
+        "thirdTrimester": "safe"
+      },
+      "concerns": [
+        "Whole-leaf stevia and crude extracts not FDA approved (only purified steviol glycosides)",
+        "May have slight blood pressure lowering effect",
+        "Some products mixed with sugar alcohols that can cause digestive issues"
+      ],
+      "safetyNotes": "FDA has given stevia (specifically Rebaudioside A) GRAS status and considers it safe during pregnancy. American Pregnancy Association lists it as safe. Purified stevia extracts are well-studied.",
+      "bottomLine": "One of the safest sweetener options during pregnancy; stick to purified forms.",
+      "sources": [
+        "FDA - GRAS Notices for Stevia",
+        "American Pregnancy Association"
+      ]
+    },
+    {
+      "id": "acesulfame_k",
+      "name": "Acesulfame Potassium (Ace-K)",
+      "aliases": ["E950", "Acesulfame K", "Sunett", "Sweet One"],
+      "category": "artificial_sweetener",
+      "description": "A calorie-free artificial sweetener about 200 times sweeter than sugar, often used in combination with other sweeteners.",
+      "function": "Non-nutritive sweetener used in diet beverages, baked goods, frozen desserts, candies, and tabletop sweeteners.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "safe",
+        "thirdTrimester": "safe"
+      },
+      "concerns": [
+        "Contains methylene chloride (potential carcinogen) as manufacturing byproduct",
+        "Less studied than aspartame and sucralose",
+        "Some animal studies raise questions about metabolic effects"
+      ],
+      "safetyNotes": "FDA considers Ace-K safe based on over 90 studies. American Pregnancy Association lists it as safe for moderate use during pregnancy. Often combined with other sweeteners in diet products.",
+      "bottomLine": "Considered safe in moderation; use moderately, especially in first trimester.",
+      "sources": [
+        "FDA - Acesulfame Potassium Food Additive Status",
+        "American Pregnancy Association"
+      ]
+    },
+    {
+      "id": "sodium_benzoate",
+      "name": "Sodium Benzoate",
+      "aliases": ["E211", "benzoate of soda"],
+      "category": "preservative",
+      "description": "A synthetic preservative that inhibits the growth of bacteria, yeast, and mold in acidic foods.",
+      "function": "Antimicrobial preservative used in soft drinks, fruit juices, pickles, sauces, and salad dressings.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Can form benzene (carcinogen) when combined with vitamin C and heat/light",
+        "May increase hyperactivity when combined with certain food dyes",
+        "Some people sensitive to benzoates (hives, asthma symptoms)"
+      ],
+      "safetyNotes": "FDA considers sodium benzoate safe at current permitted levels. The benzene formation concern is mostly relevant to soft drinks stored in heat/light. Limited pregnancy-specific research available.",
+      "bottomLine": "Generally safe in typical amounts; avoid beverages with both sodium benzoate and vitamin C exposed to heat.",
+      "sources": [
+        "FDA - Benzene in Soft Drinks",
+        "EFSA - Scientific Opinion on Benzoates"
+      ]
+    },
+    {
+      "id": "potassium_sorbate",
+      "name": "Potassium Sorbate",
+      "aliases": ["E202", "sorbate", "sorbic acid potassium salt"],
+      "category": "preservative",
+      "description": "A mild preservative that inhibits mold and yeast growth, derived from sorbic acid found naturally in some berries.",
+      "function": "Antimicrobial preservative used in cheese, wine, baked goods, dried fruits, and many processed foods.",
+      "safetyRating": {
+        "firstTrimester": "safe",
+        "secondTrimester": "safe",
+        "thirdTrimester": "safe"
+      },
+      "concerns": [
+        "May cause skin irritation in some people (contact)",
+        "Rarely may cause mild allergic reactions",
+        "Generally one of the mildest preservatives available"
+      ],
+      "safetyNotes": "FDA classifies potassium sorbate as GRAS. It's one of the mildest and most well-tolerated preservatives. Sorbic acid occurs naturally in some fruits. No specific concerns during pregnancy.",
+      "bottomLine": "One of the safest preservatives; no significant concerns during pregnancy.",
+      "sources": [
+        "FDA - GRAS Substances",
+        "EFSA - Scientific Opinion on Sorbates"
+      ]
+    },
+    {
+      "id": "tbhq",
+      "name": "TBHQ",
+      "aliases": ["E319", "tertiary butylhydroquinone", "tert-butylhydroquinone"],
+      "category": "preservative",
+      "description": "A synthetic antioxidant used to extend the shelf life of foods by preventing oxidation of fats and oils.",
+      "function": "Antioxidant preservative used in cooking oils, crackers, chips, fast food, and many fried/processed foods.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "High doses caused precancerous stomach tumors in animal studies",
+        "May affect immune system function at high doses",
+        "Found in many fast foods and highly processed foods",
+        "FDA limits it to 0.02% of oil/fat content in food"
+      ],
+      "safetyNotes": "FDA permits TBHQ in limited amounts. At typical dietary exposure, it's considered safe. However, heavy consumption of processed/fried foods could increase exposure. No specific pregnancy studies available.",
+      "bottomLine": "Limit fast food and highly processed foods to reduce exposure; probably safe at typical levels.",
+      "sources": [
+        "FDA - Food Additives Status",
+        "National Toxicology Program"
+      ]
+    },
+    {
+      "id": "titanium_dioxide",
+      "name": "Titanium Dioxide",
+      "aliases": ["E171", "TiO2", "CI 77891"],
+      "category": "food_coloring",
+      "description": "A white pigment used to brighten and whiten foods, also used in cosmetics, sunscreens, and paints.",
+      "function": "Whitening agent and opacifier used in candies, frosting, chewing gum, coffee creamer, and supplements.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Banned as food additive in the EU since 2022 due to genotoxicity concerns",
+        "Nanoparticle forms may cross biological barriers",
+        "EFSA concluded it could no longer be considered safe",
+        "Potential DNA damage concerns"
+      ],
+      "safetyNotes": "FDA still permits titanium dioxide in the US, but the EU banned it in 2022 after EFSA found it could not be considered safe due to genotoxicity concerns. The nanoparticle form is particularly concerning. Many US companies are reformulating to remove it.",
+      "bottomLine": "Consider avoiding; banned in EU due to safety concerns. Many safer alternatives exist.",
+      "sources": [
+        "EFSA - Safety Assessment of Titanium Dioxide (2021)",
+        "FDA - Color Additives"
+      ]
+    },
+    {
+      "id": "natural_flavors",
+      "name": "Natural Flavors",
+      "aliases": ["natural flavoring", "natural flavor extract"],
+      "category": "flavoring",
+      "description": "Flavoring substances derived from plant or animal sources, but may be highly processed. The term covers hundreds of possible chemicals.",
+      "function": "Provides flavor to virtually all categories of processed foods and beverages.",
+      "safetyRating": {
+        "firstTrimester": "caution",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Umbrella term that can include many different chemicals",
+        "May contain trace allergens",
+        "Not required to list specific components",
+        "May include castoreum (from beaver glands) or other animal-derived substances",
+        "Processing may involve solvents"
+      ],
+      "safetyNotes": "FDA requires natural flavors to come from natural sources but allows significant processing. The vagueness of the term makes it hard to assess. Individual components are generally considered safe, but transparency is limited. Contact manufacturer if concerned about specific products.",
+      "bottomLine": "Generally safe but vague; if you have allergies or dietary restrictions, investigate specific products.",
+      "sources": [
+        "FDA - CFR Title 21 - Natural Flavors Definition",
+        "FEMA - Flavor Ingredient Library"
+      ]
+    },
+    {
+      "id": "partially_hydrogenated_oils",
+      "name": "Partially Hydrogenated Oils",
+      "aliases": ["PHO", "trans fat", "hydrogenated vegetable oil", "trans fatty acids"],
+      "category": "fat_oil",
+      "description": "Oils that have been chemically modified through hydrogenation, creating trans fats that extend shelf life but harm health.",
+      "function": "Formerly used widely in baked goods, fried foods, margarine, and snacks for texture and shelf stability.",
+      "safetyRating": {
+        "firstTrimester": "avoid",
+        "secondTrimester": "avoid",
+        "thirdTrimester": "avoid"
+      },
+      "concerns": [
+        "Increases LDL ('bad') cholesterol and decreases HDL ('good') cholesterol",
+        "FDA determined PHOs are not GRAS - effectively banned since 2018",
+        "Linked to heart disease, inflammation, and diabetes",
+        "May interfere with fetal development and essential fatty acid metabolism",
+        "Associated with increased risk of ovulatory infertility"
+      ],
+      "safetyNotes": "FDA removed GRAS status from PHOs in 2015 and banned their intentional addition to foods as of 2018. Trans fats cross the placenta and may interfere with essential fatty acid metabolism needed for fetal brain development. Should be avoided during pregnancy.",
+      "bottomLine": "Avoid completely; FDA has banned them due to health risks. Check labels for 'partially hydrogenated.'",
+      "sources": [
+        "FDA - Trans Fat Final Determination",
+        "American Heart Association"
+      ]
+    },
+    {
+      "id": "licorice_root",
+      "name": "Licorice Root Extract",
+      "aliases": ["glycyrrhiza", "glycyrrhizin", "licorice", "liquorice", "DGL (deglycyrrhizinated)"],
+      "category": "herbal_ingredient",
+      "description": "An extract from the licorice plant root containing glycyrrhizin, used as a flavoring and in herbal medicine.",
+      "function": "Flavoring agent in candies, beverages, tobacco, and herbal supplements/teas.",
+      "safetyRating": {
+        "firstTrimester": "avoid",
+        "secondTrimester": "avoid",
+        "thirdTrimester": "avoid"
+      },
+      "concerns": [
+        "Contains glycyrrhizin which can raise blood pressure",
+        "Studies link high consumption to preterm birth",
+        "May affect fetal brain development (cognitive and behavioral effects)",
+        "Can cause potassium depletion",
+        "Finnish study found children exposed had lower IQ and more ADHD symptoms"
+      ],
+      "safetyNotes": "Multiple studies associate high licorice consumption during pregnancy with adverse outcomes including preterm birth and developmental effects. WHO recommends limiting glycyrrhizin intake. Small amounts in foods are probably fine, but avoid licorice candy, supplements, and herbal teas with licorice root.",
+      "bottomLine": "Avoid licorice root and real licorice candy during pregnancy; associated with preterm birth and developmental concerns.",
+      "sources": [
+        "American Journal of Epidemiology - Licorice and Pregnancy Studies",
+        "WHO - Glycyrrhizin Safety",
+        "Finnish Birth Cohort Studies"
+      ]
+    },
+    {
+      "id": "ginseng",
+      "name": "Ginseng",
+      "aliases": ["Panax ginseng", "Asian ginseng", "Korean ginseng", "American ginseng", "Panax quinquefolius"],
+      "category": "herbal_ingredient",
+      "description": "A root used in traditional medicine believed to boost energy and immunity, added to some foods and beverages.",
+      "function": "Herbal ingredient added to energy drinks, teas, supplements, and some candies/foods for purported energy benefits.",
+      "safetyRating": {
+        "firstTrimester": "avoid",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "May have hormonal effects (estrogenic activity)",
+        "Could potentially affect fetal development",
+        "Insufficient safety data during pregnancy",
+        "May interact with medications",
+        "Some animal studies show teratogenic effects"
+      ],
+      "safetyNotes": "American Pregnancy Association lists ginseng as 'Possibly Unsafe' during pregnancy. Limited human studies but animal studies raise concerns. Avoid supplements and limit products with added ginseng, especially in first trimester.",
+      "bottomLine": "Avoid ginseng supplements and products during pregnancy; insufficient safety data.",
+      "sources": [
+        "American Pregnancy Association - Herbs and Pregnancy",
+        "Natural Medicines Database"
+      ]
+    },
+    {
+      "id": "guarana",
+      "name": "Guarana",
+      "aliases": ["Paullinia cupana", "guarana extract", "guarana seed"],
+      "category": "stimulant_herbal",
+      "description": "A plant from the Amazon whose seeds contain about twice the caffeine concentration of coffee beans.",
+      "function": "Stimulant added to energy drinks, sodas, supplements, and some foods for energy-boosting effects.",
+      "safetyRating": {
+        "firstTrimester": "avoid",
+        "secondTrimester": "caution",
+        "thirdTrimester": "caution"
+      },
+      "concerns": [
+        "Contains high levels of caffeine (3.6-5.8% by weight vs 1-2% in coffee)",
+        "Caffeine content often not clearly labeled",
+        "Contributes to total caffeine intake which should be limited",
+        "Energy drinks with guarana may have very high combined caffeine",
+        "May contain other unstudied compounds"
+      ],
+      "safetyNotes": "Guarana's main concern is its high caffeine content. Since pregnant women should limit caffeine to under 200mg daily, guarana-containing products can easily push intake over safe limits. Energy drinks are not recommended during pregnancy. March of Dimes specifically warns against guarana.",
+      "bottomLine": "Avoid guarana and energy drinks during pregnancy; the caffeine content is difficult to track and can exceed safe limits.",
+      "sources": [
+        "March of Dimes - Caffeine in Pregnancy",
+        "FDA - Dietary Supplements",
+        "American Pregnancy Association"
+      ]
+    }
+  ],
+  "safetyRatingKey": {
+    "safe": "Generally considered safe during pregnancy at typical dietary levels",
+    "caution": "Use with caution - limit intake or consult healthcare provider",
+    "avoid": "Recommended to avoid during pregnancy"
+  },
+  "categoryDescriptions": {
+    "artificial_sweetener": "Synthetic or highly processed sugar substitutes",
+    "natural_sweetener": "Sweeteners derived from natural sources with minimal processing",
+    "nutritive_sweetener": "Sweeteners that provide calories",
+    "stimulant": "Substances that increase alertness and energy",
+    "preservative": "Ingredients that extend shelf life by preventing spoilage",
+    "food_coloring": "Substances added to change or enhance food color",
+    "flavor_enhancer": "Ingredients that intensify taste without adding distinct flavor",
+    "thickener_emulsifier": "Substances that change texture or keep ingredients mixed",
+    "thickener_stabilizer": "Substances that add thickness or maintain consistency",
+    "emulsifier": "Ingredients that help oil and water mix together",
+    "fat_oil": "Fats and oils used in food preparation",
+    "flavoring": "Substances added to impart or enhance flavor",
+    "herbal_ingredient": "Plant-derived ingredients often used for purported health benefits",
+    "stimulant_herbal": "Plant-derived stimulant ingredients"
+  }
+}
