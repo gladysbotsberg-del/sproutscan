@@ -1,32 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import concerningIngredientsDB from '@/data/ingredients.json';
-import safeIngredientsDB from '@/data/ingredients-safe.json';
-
-interface ConcerningIngredient {
-  id: string;
-  name: string;
-  aliases: string[];
-  category: string;
-  description: string;
-  function: string;
-  safetyRating: {
-    firstTrimester: string;
-    secondTrimester: string;
-    thirdTrimester: string;
-  };
-  concerns: string[];
-  safetyNotes: string;
-  bottomLine: string;
-  sources: string[];
-}
+import ingredientsDB from '@/data/ingredients-comprehensive.json';
 
 interface SafeIngredient {
-  id: string;
   name: string;
   aliases: string[];
   category: string;
-  safe: boolean;
+  why: string;
   note?: string;
+}
+
+interface ConcerningIngredient {
+  name: string;
+  aliases: string[];
+  rating: string;
+  category: string;
+  why: string;
+  avoid_if?: string;
 }
 
 interface ProductData {
@@ -38,7 +27,59 @@ interface ProductData {
   source: string;
 }
 
-// USDA FoodData Central API - PRIMARY SOURCE
+// Common prefixes to strip for fuzzy matching
+const STRIP_PREFIXES = [
+  'organic', 'natural', 'pure', 'raw', 'fresh', 'dried', 'dehydrated',
+  'powdered', 'ground', 'whole', 'enriched', 'fortified', 'unbleached',
+  'bleached', 'refined', 'unrefined', 'virgin', 'extra virgin', 'cold pressed',
+  'expeller pressed', 'hydrogenated', 'cultured', 'pasteurized', 'homogenized',
+  'low fat', 'lowfat', 'nonfat', 'non-fat', 'fat free', 'reduced fat',
+  'light', 'lite', 'unsalted', 'salted', 'roasted', 'toasted', 'blanched',
+  'freeze dried', 'freeze-dried', 'sun dried', 'sun-dried', 'air dried',
+  'smoked', 'cured', 'fermented', 'sprouted', 'malted', 'instant',
+  'quick', 'old fashioned', 'steel cut', 'rolled', 'flaked', 'cracked',
+  'stone ground', 'stone-ground', 'farm raised', 'wild caught', 'grass fed',
+  'cage free', 'free range', 'pasture raised', 'certified', 'non-gmo',
+  'gmo free', 'gluten free', 'gluten-free', 'sugar free', 'sugar-free',
+  'unsweetened', 'sweetened', 'lightly', 'heavily', 'partially', 'fully',
+  'concentrated', 'reconstituted', 'from concentrate'
+];
+
+// Normalize ingredient text for matching
+function normalizeIngredient(text: string): string {
+  let normalized = text.toLowerCase().trim();
+  
+  // Remove parenthetical content
+  normalized = normalized.replace(/\([^)]*\)/g, '').trim();
+  
+  // Remove common prefixes
+  for (const prefix of STRIP_PREFIXES) {
+    const regex = new RegExp(`^${prefix}\\s+`, 'i');
+    normalized = normalized.replace(regex, '');
+  }
+  
+  // Remove extra whitespace
+  normalized = normalized.replace(/\s+/g, ' ').trim();
+  
+  return normalized;
+}
+
+// Check if two strings are similar enough
+function isSimilar(a: string, b: string): boolean {
+  const normA = normalizeIngredient(a);
+  const normB = normalizeIngredient(b);
+  
+  // Exact match after normalization
+  if (normA === normB) return true;
+  
+  // One contains the other (for compound ingredients)
+  if (normA.length > 3 && normB.includes(normA)) return true;
+  if (normB.length > 3 && normA.includes(normB)) return true;
+  
+  return false;
+}
+
+// USDA FoodData Central API
 async function searchUSDA(barcode: string): Promise<ProductData | null> {
   try {
     console.log(`[MamaSense] USDA: Searching for ${barcode}`);
@@ -87,7 +128,7 @@ async function searchUSDA(barcode: string): Promise<ProductData | null> {
   }
 }
 
-// Open Food Facts API - FALLBACK 1
+// Open Food Facts API
 async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null> {
   try {
     console.log(`[MamaSense] OpenFoodFacts: Searching for ${barcode}`);
@@ -128,7 +169,7 @@ async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null>
   }
 }
 
-// UPCitemdb API - FALLBACK 2
+// UPCitemdb API
 async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
   try {
     console.log(`[MamaSense] UPCitemdb: Searching for ${barcode}`);
@@ -185,16 +226,13 @@ export async function GET(request: NextRequest) {
     let productData: ProductData | null = null;
     let sources: string[] = [];
     
-    // 1. PRIMARY: USDA FoodData Central
+    // 1. USDA FoodData Central
     productData = await searchUSDA(cleanBarcode);
-    if (productData) {
-      sources.push('USDA');
-    }
+    if (productData) sources.push('USDA');
     
-    // 2. FALLBACK 1: Open Food Facts
+    // 2. Open Food Facts
     if (!productData || productData.ingredients.length === 0) {
       const offData = await searchOpenFoodFacts(cleanBarcode);
-      
       if (offData) {
         if (!productData) {
           productData = offData;
@@ -202,19 +240,15 @@ export async function GET(request: NextRequest) {
         } else if (offData.ingredients.length > 0 && productData.ingredients.length === 0) {
           productData.ingredients = offData.ingredients;
           sources.push('OpenFoodFacts');
-          if (offData.image && !productData.image) {
-            productData.image = offData.image;
-          }
+          if (offData.image && !productData.image) productData.image = offData.image;
         }
       }
     }
     
-    // 3. FALLBACK 2: UPCitemdb
+    // 3. UPCitemdb
     if (!productData) {
       productData = await searchUPCitemdb(cleanBarcode);
-      if (productData) {
-        sources.push('UPCitemdb');
-      }
+      if (productData) sources.push('UPCitemdb');
     }
     
     if (productData && sources.length > 0) {
@@ -223,7 +257,6 @@ export async function GET(request: NextRequest) {
     
     console.log(`[MamaSense] Final result: ${productData ? productData.name : 'NOT FOUND'}, sources: ${sources.join(', ')}`);
     
-    // Not found
     if (!productData) {
       return NextResponse.json({
         error: 'Product not found',
@@ -232,7 +265,6 @@ export async function GET(request: NextRequest) {
       }, { status: 404 });
     }
     
-    // No ingredients
     if (productData.ingredients.length === 0) {
       return NextResponse.json({
         product: productData,
@@ -241,11 +273,10 @@ export async function GET(request: NextRequest) {
         safeIngredients: [],
         unknownIngredients: [],
         noIngredients: true,
-        message: `We found "${productData.name}" but couldn't get its ingredient list. Check the package and look for concerning ingredients like artificial sweeteners, preservatives, or caffeine.`
+        message: `We found "${productData.name}" but couldn't get its ingredient list. Check the package.`
       });
     }
 
-    // Analyze ingredients
     const safetyResult = analyzeIngredients(productData.ingredients, trimester);
 
     return NextResponse.json({
@@ -266,15 +297,16 @@ function parseIngredients(ingredientsText: string): string[] {
   
   return ingredientsText
     .toLowerCase()
-    .replace(/\([^)]*\)/g, ' ')
-    .replace(/\[[^\]]*\]/g, ' ')
+    .replace(/\([^)]*\)/g, ' ')  // Remove parenthetical content
+    .replace(/\[[^\]]*\]/g, ' ') // Remove bracketed content
     .replace(/contains:?\s*/gi, ',')
     .replace(/\d+%/g, '')
     .replace(/less than \d+% of:?/gi, ',')
     .replace(/and\/or/gi, ',')
+    .replace(/\*/g, '')  // Remove asterisks
     .split(/[,;.]/)
     .map(i => i.trim())
-    .filter(i => i.length > 1 && i.length < 50);
+    .filter(i => i.length > 1 && i.length < 60);
 }
 
 function analyzeIngredients(ingredients: string[], trimester: number) {
@@ -282,54 +314,47 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
   const safeIngredients: string[] = [];
   const unknownIngredients: string[] = [];
 
-  const concerningDB = (concerningIngredientsDB as any).ingredients as ConcerningIngredient[];
-  const safeDB = (safeIngredientsDB as any).safeIngredients as SafeIngredient[];
-  
-  const trimesterKey = trimester === 1 
-    ? 'firstTrimester' 
-    : trimester === 2 
-      ? 'secondTrimester' 
-      : 'thirdTrimester';
+  const safeDB = ingredientsDB.safeIngredients as SafeIngredient[];
+  const concerningDB = ingredientsDB.concerningIngredients as ConcerningIngredient[];
 
-  for (const ingredient of ingredients) {
-    // First check if it's a concerning ingredient
-    const concerningMatch = findConcerningMatch(ingredient, concerningDB);
+  for (const rawIngredient of ingredients) {
+    const ingredient = rawIngredient.trim();
+    if (ingredient.length < 2) continue;
     
+    // First check concerning ingredients
+    const concerningMatch = findConcerningMatch(ingredient, concerningDB);
     if (concerningMatch) {
-      const safety = concerningMatch.safetyRating[trimesterKey];
-      
-      if (safety === 'avoid') {
+      if (concerningMatch.rating === 'avoid') {
         flaggedIngredients.push({
           name: concerningMatch.name,
           rating: 'avoid',
-          concern: concerningMatch.concerns.join(' '),
-          explanation: concerningMatch.description + ' ' + concerningMatch.function,
-          bottomLine: concerningMatch.bottomLine,
+          concern: concerningMatch.why,
+          explanation: `Category: ${concerningMatch.category}`,
+          bottomLine: concerningMatch.why,
         });
-      } else if (safety === 'caution') {
+      } else if (concerningMatch.rating === 'caution') {
         flaggedIngredients.push({
           name: concerningMatch.name,
           rating: 'caution',
-          concern: concerningMatch.concerns.join(' '),
-          explanation: concerningMatch.description + ' ' + concerningMatch.function,
-          bottomLine: concerningMatch.bottomLine,
+          concern: concerningMatch.why,
+          explanation: `Category: ${concerningMatch.category}`,
+          bottomLine: concerningMatch.why,
         });
       } else {
-        // It's in the concerning DB but rated safe
+        // Rated "safe" in concerning DB (like MSG)
         safeIngredients.push(concerningMatch.name);
       }
       continue;
     }
     
-    // Then check if it's a known safe ingredient
+    // Then check safe ingredients
     const safeMatch = findSafeMatch(ingredient, safeDB);
-    
     if (safeMatch) {
       safeIngredients.push(safeMatch.name);
       continue;
     }
     
-    // Unknown ingredient
+    // Unknown
     if (ingredient.length > 2) {
       unknownIngredients.push(ingredient);
     }
@@ -342,7 +367,6 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
     overallSafety = 'caution';
   }
 
-  // Log analysis summary
   console.log(`[MamaSense] Analysis: ${safeIngredients.length} safe, ${flaggedIngredients.length} flagged, ${unknownIngredients.length} unknown`);
 
   return {
@@ -353,57 +377,32 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
   };
 }
 
-function findConcerningMatch(ingredientName: string, ingredients: ConcerningIngredient[]): ConcerningIngredient | null {
-  const normalized = ingredientName.toLowerCase().trim();
+function findConcerningMatch(ingredientText: string, db: ConcerningIngredient[]): ConcerningIngredient | null {
+  const normalized = normalizeIngredient(ingredientText);
   
-  for (const ingredient of ingredients) {
-    // Exact name match
-    if (ingredient.name.toLowerCase() === normalized) {
-      return ingredient;
-    }
+  for (const item of db) {
+    // Check main name
+    if (isSimilar(ingredientText, item.name)) return item;
     
-    // Alias match
-    for (const alias of ingredient.aliases) {
-      const aliasLower = alias.toLowerCase();
-      if (aliasLower === normalized || normalized.includes(aliasLower)) {
-        return ingredient;
-      }
-    }
-    
-    // Partial name match
-    if (normalized.includes(ingredient.name.toLowerCase())) {
-      return ingredient;
+    // Check aliases
+    for (const alias of item.aliases) {
+      if (isSimilar(ingredientText, alias)) return item;
     }
   }
   
   return null;
 }
 
-function findSafeMatch(ingredientName: string, ingredients: SafeIngredient[]): SafeIngredient | null {
-  const normalized = ingredientName.toLowerCase().trim();
+function findSafeMatch(ingredientText: string, db: SafeIngredient[]): SafeIngredient | null {
+  const normalized = normalizeIngredient(ingredientText);
   
-  for (const ingredient of ingredients) {
-    // Exact name match
-    if (ingredient.name.toLowerCase() === normalized) {
-      return ingredient;
-    }
+  for (const item of db) {
+    // Check main name
+    if (isSimilar(ingredientText, item.name)) return item;
     
-    // Alias match
-    for (const alias of ingredient.aliases) {
-      const aliasLower = alias.toLowerCase();
-      if (aliasLower === normalized || normalized === aliasLower) {
-        return ingredient;
-      }
-      // Check if the ingredient contains the alias (but alias must be > 3 chars to avoid false positives)
-      if (aliasLower.length > 3 && normalized.includes(aliasLower)) {
-        return ingredient;
-      }
-    }
-    
-    // Check if ingredient name is contained in the search term (for things like "enriched wheat flour")
-    const nameLower = ingredient.name.toLowerCase();
-    if (nameLower.length > 3 && normalized.includes(nameLower)) {
-      return ingredient;
+    // Check aliases
+    for (const alias of item.aliases) {
+      if (isSimilar(ingredientText, alias)) return item;
     }
   }
   
