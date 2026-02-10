@@ -14,6 +14,7 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
   const [manualBarcode, setManualBarcode] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [containerReady, setContainerReady] = useState(false);
   
   const scannerRef = useRef<HTMLDivElement>(null);
   const isRunningRef = useRef(false);
@@ -23,6 +24,7 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
   const stopScanner = useCallback(() => {
     if (isRunningRef.current) {
       try {
+        Quagga.offDetected();
         Quagga.stop();
       } catch (err) {
         // Ignore - scanner may already be stopped
@@ -31,23 +33,67 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
     }
   }, []);
 
+  // Wait for container to be rendered with actual dimensions
   useEffect(() => {
+    if (manualEntry) {
+      setContainerReady(false);
+      return;
+    }
+
+    const checkContainer = () => {
+      if (!scannerRef.current) return false;
+      const { offsetWidth, offsetHeight } = scannerRef.current;
+      return offsetWidth > 0 && offsetHeight > 0;
+    };
+
+    // Check immediately
+    if (checkContainer()) {
+      setContainerReady(true);
+      return;
+    }
+
+    // Poll until ready (handles async rendering)
+    const interval = setInterval(() => {
+      if (checkContainer()) {
+        setContainerReady(true);
+        clearInterval(interval);
+      }
+    }, 50);
+
+    // Cleanup
+    return () => clearInterval(interval);
+  }, [manualEntry]);
+
+  // Initialize Quagga only when container is ready
+  useEffect(() => {
+    if (!containerReady || manualEntry) {
+      return;
+    }
+
     mountedRef.current = true;
     lastScannedRef.current = null;
     
-    const startScanner = async () => {
-      if (manualEntry || !scannerRef.current) {
+    const initScanner = async () => {
+      const container = scannerRef.current;
+      if (!container) {
+        console.error('[Scanner] Container ref is null');
+        setError('Scanner container not found. Tap "Enter Manually" below.');
         setIsInitializing(false);
         return;
       }
 
-      setIsInitializing(true);
-      setError(null);
+      // Double-check dimensions
+      const width = container.offsetWidth;
+      const height = container.offsetHeight;
+      
+      if (!width || !height || width <= 0 || height <= 0) {
+        console.error(`[Scanner] Invalid dimensions: ${width}x${height}`);
+        setError('Scanner failed to initialize. Tap "Enter Manually" below.');
+        setIsInitializing(false);
+        return;
+      }
 
-      // Wait for DOM
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      if (!mountedRef.current) return;
+      console.log(`[Scanner] Container ready: ${width}x${height}`);
 
       try {
         await new Promise<void>((resolve, reject) => {
@@ -55,7 +101,7 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
             inputStream: {
               name: 'Live',
               type: 'LiveStream',
-              target: scannerRef.current!,
+              target: container,
               constraints: {
                 facingMode: 'environment',
                 width: { min: 640, ideal: 1280, max: 1920 },
@@ -117,7 +163,7 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
           setIsInitializing(false);
         }
       } catch (err: any) {
-        console.error('Scanner error:', err);
+        console.error('[Scanner] Init error:', err);
         
         if (mountedRef.current) {
           setIsInitializing(false);
@@ -128,6 +174,8 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
             setError('Camera permission denied. Tap "Enter Manually" below.');
           } else if (msg.includes('NotFound') || msg.includes('not found')) {
             setError('No camera found. Tap "Enter Manually" below.');
+          } else if (msg.includes('NotReadable') || msg.includes('in use')) {
+            setError('Camera is in use by another app. Tap "Enter Manually" below.');
           } else {
             setError('Could not start camera. Tap "Enter Manually" below.');
           }
@@ -135,14 +183,13 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
       }
     };
 
-    startScanner();
+    initScanner();
 
     return () => {
       mountedRef.current = false;
-      Quagga.offDetected();
       stopScanner();
     };
-  }, [manualEntry, onScan, stopScanner]);
+  }, [containerReady, manualEntry, onScan, stopScanner]);
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,8 +207,11 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
   const toggleManualEntry = () => {
     if (!manualEntry) {
       stopScanner();
+      setContainerReady(false);
     }
     setManualEntry(!manualEntry);
+    setIsInitializing(true);
+    setError(null);
   };
 
   return (
@@ -184,18 +234,20 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
         {!manualEntry ? (
           <div className="flex-1 flex flex-col items-center justify-center p-4">
             {isInitializing && (
-              <div className="text-white text-center">
+              <div className="text-white text-center mb-4">
                 <div className="animate-spin w-10 h-10 border-4 border-white border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p>Starting camera...</p>
               </div>
             )}
             
+            {/* Container is ALWAYS rendered so we can measure it */}
             <div 
               ref={scannerRef}
               className="w-full max-w-lg bg-gray-900 rounded-lg overflow-hidden relative"
               style={{ 
                 height: '350px',
-                display: isInitializing ? 'none' : 'block'
+                minHeight: '350px',
+                opacity: isInitializing ? 0.3 : 1,
               }}
             />
 
