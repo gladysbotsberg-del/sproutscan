@@ -97,7 +97,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const maxDate = new Date(today.getTime() + 280 * 86400000).toISOString().split('T')[0];
 
   return (
-    <main className="min-h-screen flex flex-col relative" style={{ background: 'linear-gradient(180deg, #FFFAF9 0%, #FFF5F3 40%, #FDE8E4 100%)' }}>
+    <main className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #FFFAF9 0%, #FFF5F3 40%, #FDE8E4 100%)' }}>
       {/* Back button */}
       {step > 1 && (
         <button
@@ -125,7 +125,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </button>
       )}
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+      <div className={`flex-1 flex flex-col items-center px-6 py-12 ${step === 4 ? 'justify-start overflow-y-auto pt-16' : 'justify-center'}`}>
         {/* Progress bar — steps 2-4 only */}
         {step > 1 && (
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '32px' }}>
