@@ -10,9 +10,15 @@ import SafetyBadge from '@/components/SafetyBadge';
 
 export type Trimester = 1 | 2 | 3;
 
+export type DietaryRestriction =
+  | 'vegetarian' | 'vegan' | 'gluten-free' | 'dairy-free'
+  | 'nut-allergy' | 'soy-allergy' | 'egg-allergy' | 'shellfish-allergy'
+  | 'gestational-diabetes' | 'lactose-intolerant';
+
 export interface UserProfile {
   trimester: Trimester;
   dueDate?: string;
+  dietaryRestrictions?: DietaryRestriction[];
 }
 
 export interface ProductData {
