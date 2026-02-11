@@ -1,7 +1,7 @@
-# 🍼 MamaSense
+# SproutScan
 
 ## Project Status: ACTIVE
-**Name:** MamaSense
+**Name:** SproutScan
 **Started:** February 7, 2026
 **Goal:** Build the definitive pregnancy-safe ingredient scanner app
 
@@ -28,8 +28,3 @@ Give expecting mothers instant, ingredient-level safety information — filtered
 - [ ] GTM.md — Go-to-market strategy
 - [ ] TECH.md — Technical architecture
 - [ ] DATABASE.md — Ingredient database schema
-
----
-
-*"We're not here to fuck around. We're here to get rich."*
-— The President, Feb 7, 2026
