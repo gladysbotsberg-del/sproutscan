@@ -2,6 +2,7 @@
 
 import { SafetyResult, FlaggedIngredient } from '@/app/page';
 import { useState } from 'react';
+import SafetyBadge from './SafetyBadge';
 
 interface ProductResultProps {
   result: SafetyResult;
@@ -11,30 +12,34 @@ interface ProductResultProps {
 export default function ProductResult({ result, onScanAnother }: ProductResultProps) {
   const [expandedIngredient, setExpandedIngredient] = useState<string | null>(null);
 
-  const safetyConfig: Record<string, { bg: string; icon: string; label: string; color: string }> = {
-    safe: { 
-      bg: 'var(--safe-green-light)', 
-      icon: '✓', 
+  const safetyConfig: Record<string, { bg: string; icon: string; label: string; color: string; border: string }> = {
+    safe: {
+      bg: 'var(--safety-safe-bg)',
+      icon: '\u2713',
       label: 'Safe to Enjoy',
-      color: 'var(--safe-green)'
+      color: 'var(--safety-safe-text)',
+      border: 'var(--safety-safe-border)',
     },
-    caution: { 
-      bg: 'var(--caution-amber-light)', 
-      icon: '!', 
+    caution: {
+      bg: 'var(--safety-caution-bg)',
+      icon: '!',
       label: 'Use Caution',
-      color: 'var(--caution-amber)'
+      color: 'var(--safety-caution-text)',
+      border: 'var(--safety-caution-border)',
     },
-    avoid: { 
-      bg: 'var(--avoid-red-light)', 
-      icon: '✗', 
+    avoid: {
+      bg: 'var(--safety-avoid-bg)',
+      icon: '\u2717',
       label: 'Best to Avoid',
-      color: 'var(--avoid-red)'
+      color: 'var(--safety-avoid-text)',
+      border: 'var(--safety-avoid-border)',
     },
-    unknown: { 
-      bg: 'var(--border-light)', 
-      icon: '?', 
+    unknown: {
+      bg: 'var(--bg-warm)',
+      icon: '?',
       label: 'No Ingredient Data',
-      color: 'var(--text-secondary)'
+      color: 'var(--text-secondary)',
+      border: 'rgba(0,0,0,0.08)',
     },
   };
 
@@ -43,25 +48,37 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
   return (
     <div className="space-y-5">
       {/* Product Card */}
-      <div className="bg-white rounded-2xl shadow-sm p-4">
+      <div
+        style={{
+          background: 'white',
+          borderRadius: '18px',
+          padding: '16px',
+          border: '1px solid rgba(232,131,107,0.07)',
+          boxShadow: 'var(--shadow-card)',
+        }}
+      >
         <div className="flex items-center gap-4">
           {result.product.image ? (
-            <img 
-              src={result.product.image} 
+            <img
+              src={result.product.image}
               alt={result.product.name}
               className="w-20 h-20 object-contain rounded-xl"
-              style={{ background: 'var(--mama-peach)' }}
+              style={{ background: 'var(--bg-blush)' }}
             />
           ) : (
-            <div 
+            <div
               className="w-20 h-20 rounded-xl flex items-center justify-center"
-              style={{ background: 'var(--mama-peach)' }}
+              style={{ background: 'var(--bg-blush)' }}
             >
-              <span className="text-3xl">📦</span>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--text-hint)" strokeWidth="1.5">
+                <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
+              </svg>
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h3 
+            <h3
               className="font-bold text-lg leading-tight"
               style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
             >
@@ -73,7 +90,7 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
               </p>
             )}
             {result.product.source && (
-              <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+              <p className="text-xs mt-2" style={{ color: 'var(--text-hint)' }}>
                 via {result.product.source}
               </p>
             )}
@@ -82,26 +99,31 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
       </div>
 
       {/* Safety Rating Card */}
-      <div 
-        className="rounded-2xl p-6 text-center"
-        style={{ background: config.bg }}
+      <div
+        style={{
+          borderRadius: '18px',
+          padding: '24px',
+          textAlign: 'center',
+          background: config.bg,
+          border: `1.5px solid ${config.border}`,
+        }}
       >
-        <div 
+        <div
           className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl font-bold text-white"
           style={{ background: config.color }}
         >
           {config.icon}
         </div>
-        <div 
+        <div
           className="text-xl font-bold"
           style={{ fontFamily: 'var(--font-display)', color: config.color }}
         >
           {config.label}
         </div>
         <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>
-          {result.noIngredients 
+          {result.noIngredients
             ? 'Check the package for ingredients'
-            : result.flaggedIngredients.length === 0 
+            : result.flaggedIngredients.length === 0
               ? 'No concerning ingredients detected'
               : `${result.flaggedIngredients.length} ingredient${result.flaggedIngredients.length > 1 ? 's' : ''} to watch`
           }
@@ -110,12 +132,20 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
 
       {/* No Ingredients Message */}
       {result.noIngredients && result.message && (
-        <div 
-          className="rounded-2xl p-4"
-          style={{ background: 'var(--caution-amber-light)' }}
+        <div
+          style={{
+            borderRadius: '18px',
+            padding: '16px',
+            background: 'var(--safety-caution-bg)',
+            border: '1.5px solid var(--safety-caution-border)',
+          }}
         >
           <div className="flex items-start gap-3">
-            <span className="text-xl">💡</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--safety-caution-text)" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
             <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{result.message}</p>
           </div>
         </div>
@@ -123,9 +153,17 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
 
       {/* Flagged Ingredients */}
       {result.flaggedIngredients.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--border-light)' }}>
-            <h4 
+        <div
+          style={{
+            background: 'white',
+            borderRadius: '18px',
+            overflow: 'hidden',
+            border: '1px solid rgba(232,131,107,0.07)',
+            boxShadow: 'var(--shadow-card)',
+          }}
+        >
+          <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--bg-blush)' }}>
+            <h4
               className="font-bold"
               style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
             >
@@ -150,23 +188,31 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
 
       {/* Safe Ingredients */}
       {result.safeIngredients.length > 0 && (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          <div className="px-4 py-3 flex items-center gap-2 border-b" style={{ borderColor: 'var(--border-light)' }}>
-            <div 
+        <div
+          style={{
+            background: 'white',
+            borderRadius: '18px',
+            overflow: 'hidden',
+            border: '1px solid rgba(232,131,107,0.07)',
+            boxShadow: 'var(--shadow-card)',
+          }}
+        >
+          <div className="px-4 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--bg-blush)' }}>
+            <div
               className="w-6 h-6 rounded-full flex items-center justify-center text-xs text-white"
-              style={{ background: 'var(--safe-green)' }}
+              style={{ background: 'var(--green-primary)' }}
             >
-              ✓
+              {'\u2713'}
             </div>
-            <h4 
+            <h4
               className="font-bold"
               style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
             >
               Safe Ingredients
             </h4>
-            <span 
+            <span
               className="ml-auto text-sm px-2 py-0.5 rounded-full"
-              style={{ background: 'var(--safe-green-light)', color: 'var(--safe-green)' }}
+              style={{ background: 'var(--green-pale)', color: 'var(--green-primary)' }}
             >
               {result.safeIngredients.length}
             </span>
@@ -184,9 +230,19 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
 
       {/* Unknown Ingredients (if many) */}
       {result.unknownIngredients.length > 3 && (
-        <div className="bg-white rounded-2xl shadow-sm p-4">
+        <div
+          style={{
+            background: 'white',
+            borderRadius: '18px',
+            padding: '16px',
+            border: '1px solid rgba(232,131,107,0.07)',
+            boxShadow: 'var(--shadow-card)',
+          }}
+        >
           <div className="flex items-start gap-3">
-            <span className="text-xl">🔬</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
+              <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
+            </svg>
             <div>
               <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
                 {result.unknownIngredients.length} ingredients not in our database
@@ -200,12 +256,15 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
       )}
 
       {/* Disclaimer */}
-      <div 
-        className="rounded-2xl p-4"
-        style={{ background: 'var(--mama-coral-light)' }}
+      <div
+        style={{
+          borderRadius: '18px',
+          padding: '16px',
+          background: 'var(--bg-blush)',
+        }}
       >
         <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-          <strong>Note:</strong> This is educational information, not medical advice. 
+          <strong>Note:</strong> This is educational information, not medical advice.
           Always consult your healthcare provider about your specific dietary needs during pregnancy.
         </p>
       </div>
@@ -215,7 +274,10 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
         <button
           onClick={onScanAnother}
           className="w-full py-4 rounded-2xl font-bold text-white btn-press"
-          style={{ background: 'linear-gradient(135deg, var(--mama-coral) 0%, #E8927A 100%)' }}
+          style={{
+            background: 'var(--brand-gradient)',
+            boxShadow: 'var(--shadow-button)',
+          }}
         >
           Scan Another Product
         </button>
@@ -224,32 +286,29 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
   );
 }
 
-function IngredientCard({ 
-  ingredient, 
-  expanded, 
+function IngredientCard({
+  ingredient,
+  expanded,
   onToggle,
   isLast
-}: { 
-  ingredient: FlaggedIngredient; 
+}: {
+  ingredient: FlaggedIngredient;
   expanded: boolean;
   onToggle: () => void;
   isLast: boolean;
 }) {
   const isAvoid = ingredient.rating === 'avoid';
-  const bgColor = isAvoid ? 'var(--avoid-red-light)' : 'var(--caution-amber-light)';
-  const textColor = isAvoid ? 'var(--avoid-red)' : 'var(--caution-amber)';
-  const icon = isAvoid ? '✗' : '!';
+  const bgColor = isAvoid ? 'var(--safety-avoid-bg)' : 'var(--safety-caution-bg)';
+  const textColor = isAvoid ? 'var(--safety-avoid-text)' : 'var(--safety-caution-text)';
+  const icon = isAvoid ? '\u2717' : '!';
 
   return (
-    <div 
-      className={!isLast ? 'border-b' : ''}
-      style={{ borderColor: 'var(--border-light)' }}
-    >
-      <button 
+    <div style={{ borderBottom: !isLast ? '1px solid var(--bg-blush)' : 'none' }}>
+      <button
         onClick={onToggle}
         className="w-full p-4 text-left flex items-center gap-3 btn-press"
       >
-        <div 
+        <div
           className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
           style={{ background: bgColor, color: textColor }}
         >
@@ -258,29 +317,46 @@ function IngredientCard({
         <span className="font-semibold flex-1" style={{ color: 'var(--text-primary)' }}>
           {ingredient.name}
         </span>
-        <svg 
+        <SafetyBadge rating={ingredient.rating as 'caution' | 'avoid'} size="sm" />
+        <svg
           className={`w-5 h-5 transition-transform ${expanded ? 'rotate-180' : ''}`}
           style={{ color: 'var(--text-muted)' }}
-          fill="none" 
-          stroke="currentColor" 
+          fill="none"
+          stroke="currentColor"
           viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
-      
+
       {expanded && (
         <div className="px-4 pb-4 space-y-3">
-          <div 
-            className="rounded-xl p-3"
-            style={{ background: bgColor }}
+          <div
+            style={{
+              borderRadius: '12px',
+              padding: '12px',
+              background: bgColor,
+              border: `1px solid ${isAvoid ? 'var(--safety-avoid-border)' : 'var(--safety-caution-border)'}`,
+            }}
           >
-            <p className="text-sm font-medium" style={{ color: textColor }}>
-              {ingredient.rating === 'avoid' ? '🚫 ' : '⚠️ '}
+            <p className="text-sm font-medium flex items-center gap-2" style={{ color: textColor }}>
+              {isAvoid ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="15" y1="9" x2="9" y2="15" />
+                  <line x1="9" y1="9" x2="15" y2="15" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                  <line x1="12" y1="9" x2="12" y2="13" />
+                  <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
+              )}
               {ingredient.rating === 'avoid' ? 'Recommended to avoid' : 'Use with caution'}
             </p>
           </div>
-          
+
           <div>
             <p className="text-xs font-semibold uppercase mb-1" style={{ color: 'var(--text-muted)' }}>
               Why it's flagged
@@ -289,7 +365,7 @@ function IngredientCard({
               {ingredient.concern}
             </p>
           </div>
-          
+
           <div>
             <p className="text-xs font-semibold uppercase mb-1" style={{ color: 'var(--text-muted)' }}>
               What it is
@@ -298,10 +374,13 @@ function IngredientCard({
               {ingredient.explanation}
             </p>
           </div>
-          
-          <div 
-            className="rounded-xl p-3"
-            style={{ background: 'var(--mama-peach)' }}
+
+          <div
+            style={{
+              borderRadius: '12px',
+              padding: '12px',
+              background: 'var(--bg-warm)',
+            }}
           >
             <p className="text-xs font-semibold uppercase mb-1" style={{ color: 'var(--text-muted)' }}>
               Bottom Line

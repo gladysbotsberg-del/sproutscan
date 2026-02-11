@@ -64,25 +64,88 @@ function normalizeIngredient(text: string): string {
   return normalized;
 }
 
+// Levenshtein edit distance for typo tolerance
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+
+  let prev = Array.from({ length: n + 1 }, (_, i) => i);
+  let curr = new Array(n + 1);
+
+  for (let i = 1; i <= m; i++) {
+    curr[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      curr[j] = Math.min(
+        prev[j] + 1,      // deletion
+        curr[j - 1] + 1,  // insertion
+        prev[j - 1] + cost // substitution
+      );
+    }
+    [prev, curr] = [curr, prev];
+  }
+  return prev[n];
+}
+
+// Strip trailing s/es for basic plural tolerance
+function depluralize(word: string): string {
+  if (word.endsWith('ies') && word.length > 4) return word.slice(0, -3) + 'y';
+  if (word.endsWith('es') && word.length > 3) return word.slice(0, -2);
+  if (word.endsWith('s') && !word.endsWith('ss') && word.length > 3) return word.slice(0, -1);
+  return word;
+}
+
 // Check if two strings are similar enough
 function isSimilar(a: string, b: string): boolean {
   const normA = normalizeIngredient(a);
   const normB = normalizeIngredient(b);
-  
+
   // Exact match after normalization
   if (normA === normB) return true;
-  
+
+  // Depluralized match
+  if (depluralize(normA) === depluralize(normB)) return true;
+
   // One contains the other (for compound ingredients)
   if (normA.length > 3 && normB.includes(normA)) return true;
   if (normB.length > 3 && normA.includes(normB)) return true;
-  
+
+  // Token overlap: all tokens from shorter string appear in longer string
+  const tokensA = normA.split(/\s+/);
+  const tokensB = normB.split(/\s+/);
+  if (tokensA.length > 1 || tokensB.length > 1) {
+    const [shorter, longer] = tokensA.length <= tokensB.length
+      ? [tokensA, tokensB] : [tokensB, tokensA];
+    const longerStr = longer.join(' ');
+    const allMatch = shorter.every(token =>
+      token.length > 2 && longerStr.includes(token)
+    );
+    if (allMatch && shorter.length > 0) return true;
+  }
+
+  // Levenshtein edit distance for typo tolerance
+  // Only on single-word or short strings to avoid false positives
+  const depA = depluralize(normA);
+  const depB = depluralize(normB);
+  const maxLen = Math.max(depA.length, depB.length);
+  const minLen = Math.min(depA.length, depB.length);
+
+  // Skip if lengths are too different (more than 2 apart)
+  if (Math.abs(depA.length - depB.length) <= 2 && minLen >= 4) {
+    const dist = levenshtein(depA, depB);
+    // Allow 1 edit for 4-5 char strings, 2 edits for 6+ char strings
+    const threshold = maxLen <= 5 ? 1 : 2;
+    if (dist <= threshold) return true;
+  }
+
   return false;
 }
 
 // USDA FoodData Central API
 async function searchUSDA(barcode: string): Promise<ProductData | null> {
   try {
-    console.log(`[MamaSense] USDA: Searching for ${barcode}`);
+    console.log(`[SproutScan] USDA: Searching for ${barcode}`);
     
     const response = await fetch(
       `https://api.nal.usda.gov/fdc/v1/foods/search?query=${barcode}&dataType=Branded&pageSize=10&api_key=DEMO_KEY`,
@@ -90,12 +153,12 @@ async function searchUSDA(barcode: string): Promise<ProductData | null> {
     );
     
     if (!response.ok) {
-      console.log(`[MamaSense] USDA: API returned ${response.status}`);
+      console.log(`[SproutScan] USDA: API returned ${response.status}`);
       return null;
     }
     
     const data = await response.json();
-    console.log(`[MamaSense] USDA: Found ${data.foods?.length || 0} results`);
+    console.log(`[SproutScan] USDA: Found ${data.foods?.length || 0} results`);
     
     if (data.foods && data.foods.length > 0) {
       const exactMatch = data.foods.find((f: any) => {
@@ -108,7 +171,7 @@ async function searchUSDA(barcode: string): Promise<ProductData | null> {
       const food = exactMatch || data.foods[0];
       
       if (food && food.ingredients) {
-        console.log(`[MamaSense] USDA: Using ${exactMatch ? 'exact match' : 'first result'}: ${food.description}`);
+        console.log(`[SproutScan] USDA: Using ${exactMatch ? 'exact match' : 'first result'}: ${food.description}`);
         return {
           name: food.description || 'Unknown Product',
           brand: food.brandOwner || food.brandName || '',
@@ -120,10 +183,10 @@ async function searchUSDA(barcode: string): Promise<ProductData | null> {
       }
     }
     
-    console.log(`[MamaSense] USDA: No results with ingredients`);
+    console.log(`[SproutScan] USDA: No results with ingredients`);
     return null;
   } catch (err) {
-    console.error('[MamaSense] USDA API error:', err);
+    console.error('[SproutScan] USDA API error:', err);
     return null;
   }
 }
@@ -131,7 +194,7 @@ async function searchUSDA(barcode: string): Promise<ProductData | null> {
 // Open Food Facts API
 async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null> {
   try {
-    console.log(`[MamaSense] OpenFoodFacts: Searching for ${barcode}`);
+    console.log(`[SproutScan] OpenFoodFacts: Searching for ${barcode}`);
     
     const response = await fetch(
       `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`,
@@ -139,7 +202,7 @@ async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null>
     );
     
     if (!response.ok) {
-      console.log(`[MamaSense] OpenFoodFacts: API returned ${response.status}`);
+      console.log(`[SproutScan] OpenFoodFacts: API returned ${response.status}`);
       return null;
     }
     
@@ -149,7 +212,7 @@ async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null>
       const product = data.product;
       const ingredientsText = product.ingredients_text || product.ingredients_text_en || '';
       
-      console.log(`[MamaSense] OpenFoodFacts: Found ${product.product_name}, ingredients: ${ingredientsText.length > 0 ? 'yes' : 'no'}`);
+      console.log(`[SproutScan] OpenFoodFacts: Found ${product.product_name}, ingredients: ${ingredientsText.length > 0 ? 'yes' : 'no'}`);
       
       return {
         name: product.product_name || product.product_name_en || 'Unknown Product',
@@ -161,10 +224,10 @@ async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null>
       };
     }
     
-    console.log(`[MamaSense] OpenFoodFacts: Product not found`);
+    console.log(`[SproutScan] OpenFoodFacts: Product not found`);
     return null;
   } catch (err) {
-    console.error('[MamaSense] Open Food Facts API error:', err);
+    console.error('[SproutScan] Open Food Facts API error:', err);
     return null;
   }
 }
@@ -172,7 +235,7 @@ async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null>
 // UPCitemdb API
 async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
   try {
-    console.log(`[MamaSense] UPCitemdb: Searching for ${barcode}`);
+    console.log(`[SproutScan] UPCitemdb: Searching for ${barcode}`);
     
     const response = await fetch(
       `https://api.upcitemdb.com/prod/trial/lookup?upc=${barcode}`,
@@ -183,7 +246,7 @@ async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
     );
     
     if (!response.ok) {
-      console.log(`[MamaSense] UPCitemdb: API returned ${response.status}`);
+      console.log(`[SproutScan] UPCitemdb: API returned ${response.status}`);
       return null;
     }
     
@@ -191,7 +254,7 @@ async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
     
     if (data.items && data.items.length > 0) {
       const item = data.items[0];
-      console.log(`[MamaSense] UPCitemdb: Found ${item.title}`);
+      console.log(`[SproutScan] UPCitemdb: Found ${item.title}`);
       return {
         name: item.title || 'Unknown Product',
         brand: item.brand || '',
@@ -202,10 +265,10 @@ async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
       };
     }
     
-    console.log(`[MamaSense] UPCitemdb: Product not found`);
+    console.log(`[SproutScan] UPCitemdb: Product not found`);
     return null;
   } catch (err) {
-    console.error('[MamaSense] UPCitemdb API error:', err);
+    console.error('[SproutScan] UPCitemdb API error:', err);
     return null;
   }
 }
@@ -220,7 +283,7 @@ export async function GET(request: NextRequest) {
   }
 
   const cleanBarcode = barcode.replace(/[\s-]/g, '');
-  console.log(`\n[MamaSense] ========== SCAN: ${cleanBarcode} ==========`);
+  console.log(`\n[SproutScan] ========== SCAN: ${cleanBarcode} ==========`);
 
   try {
     let productData: ProductData | null = null;
@@ -255,7 +318,7 @@ export async function GET(request: NextRequest) {
       productData.source = sources.join(' + ');
     }
     
-    console.log(`[MamaSense] Final result: ${productData ? productData.name : 'NOT FOUND'}, sources: ${sources.join(', ')}`);
+    console.log(`[SproutScan] Final result: ${productData ? productData.name : 'NOT FOUND'}, sources: ${sources.join(', ')}`);
     
     if (!productData) {
       return NextResponse.json({
@@ -284,7 +347,7 @@ export async function GET(request: NextRequest) {
       ...safetyResult,
     });
   } catch (error) {
-    console.error('[MamaSense] Error:', error);
+    console.error('[SproutScan] Error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch product information. Please try again.' },
       { status: 500 }
@@ -367,7 +430,7 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
     overallSafety = 'caution';
   }
 
-  console.log(`[MamaSense] Analysis: ${safeIngredients.length} safe, ${flaggedIngredients.length} flagged, ${unknownIngredients.length} unknown`);
+  console.log(`[SproutScan] Analysis: ${safeIngredients.length} safe, ${flaggedIngredients.length} flagged, ${unknownIngredients.length} unknown`);
 
   return {
     overallSafety,

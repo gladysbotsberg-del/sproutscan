@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import Quagga from '@ericblade/quagga2';
+import { SproutScanIcon } from './SproutScanIcon';
 
 interface ScannerProps {
   onScan: (barcode: string) => void;
@@ -15,7 +16,7 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [containerReady, setContainerReady] = useState(false);
-  
+
   const scannerRef = useRef<HTMLDivElement>(null);
   const isRunningRef = useRef(false);
   const mountedRef = useRef(true);
@@ -46,13 +47,11 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
       return offsetWidth > 0 && offsetHeight > 0;
     };
 
-    // Check immediately
     if (checkContainer()) {
       setContainerReady(true);
       return;
     }
 
-    // Poll until ready (handles async rendering)
     const interval = setInterval(() => {
       if (checkContainer()) {
         setContainerReady(true);
@@ -60,7 +59,6 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
       }
     }, 50);
 
-    // Cleanup
     return () => clearInterval(interval);
   }, [manualEntry]);
 
@@ -72,7 +70,7 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
 
     mountedRef.current = true;
     lastScannedRef.current = null;
-    
+
     const initScanner = async () => {
       const container = scannerRef.current;
       if (!container) {
@@ -82,10 +80,9 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
         return;
       }
 
-      // Double-check dimensions
       const width = container.offsetWidth;
       const height = container.offsetHeight;
-      
+
       if (!width || !height || width <= 0 || height <= 0) {
         console.error(`[Scanner] Invalid dimensions: ${width}x${height}`);
         setError('Scanner failed to initialize. Tap "Enter Manually" below.');
@@ -141,18 +138,15 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
         Quagga.start();
         isRunningRef.current = true;
 
-        // Handle successful scans
         Quagga.onDetected((result) => {
           if (!mountedRef.current) return;
-          
+
           const code = result.codeResult?.code;
           if (!code) return;
-          
-          // Debounce: ignore if same code scanned within 1 second
+
           if (lastScannedRef.current === code) return;
           lastScannedRef.current = code;
-          
-          // Stop scanner and report result
+
           stopScanner();
           onScan(code);
         });
@@ -163,11 +157,11 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
         }
       } catch (err: any) {
         console.error('[Scanner] Init error:', err);
-        
+
         if (mountedRef.current) {
           setIsInitializing(false);
           setHasPermission(false);
-          
+
           const msg = err?.message || String(err);
           if (msg.includes('Permission') || msg.includes('NotAllowed')) {
             setError('Camera permission denied. Tap "Enter Manually" below.');
@@ -214,18 +208,37 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-black p-4 flex-shrink-0">
-        <div className="flex items-center justify-between">
-          <h2 className="text-white font-semibold text-lg">Scan Barcode</h2>
-          <button 
-            onClick={handleClose}
-            className="text-white p-2 text-2xl leading-none"
-          >
-            ×
-          </button>
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: '#1A1A2E' }}>
+      {/* Top Bar */}
+      <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <button
+          onClick={handleClose}
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: '12px',
+            background: 'rgba(255,255,255,0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <SproutScanIcon size={24} />
+          <span style={{ fontFamily: 'var(--font-display, Nunito, system-ui)', fontWeight: 800, fontSize: '16px', color: 'white' }}>
+            SproutScan
+          </span>
         </div>
+
+        <div style={{ width: 40, height: 40 }} />
       </div>
 
       {/* Main Content */}
@@ -233,56 +246,95 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
         {!manualEntry ? (
           <div className="flex-1 flex flex-col items-center justify-center p-4">
             {isInitializing && (
-              <div className="text-white text-center mb-4">
-                <div className="animate-spin w-10 h-10 border-4 border-white border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p>Starting camera...</p>
+              <div className="text-center mb-4">
+                <div
+                  className="animate-spin w-10 h-10 rounded-full mx-auto mb-4"
+                  style={{ border: '3px solid rgba(255,255,255,0.2)', borderTopColor: 'var(--brand-coral)' }}
+                ></div>
+                <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px' }}>Starting camera...</p>
               </div>
             )}
-            
-            {/* Container is ALWAYS rendered so we can measure it */}
-            <div 
-              ref={scannerRef}
-              className="w-full max-w-lg bg-gray-900 rounded-lg overflow-hidden relative"
-              style={{ 
-                height: '350px',
-                minHeight: '350px',
-                opacity: isInitializing ? 0.3 : 1,
-              }}
-            />
+
+            {/* Scanner container with viewfinder overlay */}
+            <div className="relative w-full max-w-lg" style={{ height: '350px', minHeight: '350px' }}>
+              {/* Camera feed container */}
+              <div
+                ref={scannerRef}
+                className="w-full h-full rounded-2xl overflow-hidden"
+                style={{
+                  background: '#0D0D1A',
+                  opacity: isInitializing ? 0.3 : 1,
+                }}
+              />
+
+              {/* Viewfinder overlay */}
+              {!isInitializing && hasPermission && (
+                <>
+                  {/* Corner accents */}
+                  <div style={{ position: 'absolute', top: 24, left: 24, width: 24, height: 24, borderTop: '3px solid var(--brand-coral)', borderLeft: '3px solid var(--brand-coral)', borderTopLeftRadius: '4px' }} />
+                  <div style={{ position: 'absolute', top: 24, right: 24, width: 24, height: 24, borderTop: '3px solid var(--brand-coral)', borderRight: '3px solid var(--brand-coral)', borderTopRightRadius: '4px' }} />
+                  <div style={{ position: 'absolute', bottom: 24, left: 24, width: 24, height: 24, borderBottom: '3px solid var(--brand-coral)', borderLeft: '3px solid var(--brand-coral)', borderBottomLeftRadius: '4px' }} />
+                  <div style={{ position: 'absolute', bottom: 24, right: 24, width: 24, height: 24, borderBottom: '3px solid var(--brand-coral)', borderRight: '3px solid var(--brand-coral)', borderBottomRightRadius: '4px' }} />
+
+                  {/* Animated scan line */}
+                  <div className="scan-line" />
+                </>
+              )}
+            </div>
 
             {!isInitializing && hasPermission && (
-              <p className="text-gray-400 text-sm mt-4 text-center">
-                Point camera at barcode — it will scan automatically
+              <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginTop: '16px', textAlign: 'center' }}>
+                Align barcode within the frame
               </p>
             )}
-            
+
             {error && (
-              <div className="text-white text-center p-4 mt-4 bg-red-900/70 rounded-lg max-w-sm">
-                <p>{error}</p>
+              <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(200,40,40,0.15)', borderRadius: '12px', maxWidth: '340px', border: '1px solid rgba(200,40,40,0.3)' }}>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '14px', textAlign: 'center' }}>{error}</p>
               </div>
             )}
           </div>
         ) : (
           <div className="flex-1 flex items-center justify-center p-6">
             <form onSubmit={handleManualSubmit} className="w-full max-w-sm">
-              <label className="text-white block mb-2 text-lg">Enter barcode number:</label>
+              <label style={{ color: 'rgba(255,255,255,0.8)', fontSize: '16px', display: 'block', marginBottom: '8px' }}>Enter barcode number:</label>
               <input
                 type="text"
                 inputMode="numeric"
                 value={manualBarcode}
                 onChange={(e) => setManualBarcode(e.target.value)}
                 placeholder="e.g., 049000006346"
-                className="w-full p-4 rounded-lg text-lg mb-4 text-black"
                 autoFocus
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  borderRadius: '14px',
+                  border: '1.5px solid rgba(255,255,255,0.15)',
+                  background: 'rgba(255,255,255,0.08)',
+                  color: 'white',
+                  fontSize: '16px',
+                  marginBottom: '12px',
+                  outline: 'none',
+                }}
               />
               <button
                 type="submit"
                 disabled={!manualBarcode.trim()}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white py-4 rounded-lg font-semibold"
+                style={{
+                  width: '100%',
+                  padding: '16px',
+                  borderRadius: '14px',
+                  background: manualBarcode.trim() ? 'linear-gradient(135deg, #E8836B, #D4567A)' : 'rgba(255,255,255,0.1)',
+                  color: 'white',
+                  fontWeight: 700,
+                  fontSize: '16px',
+                  border: 'none',
+                  cursor: manualBarcode.trim() ? 'pointer' : 'not-allowed',
+                }}
               >
                 Check Product
               </button>
-              <p className="text-gray-400 text-sm mt-4 text-center">
+              <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '13px', marginTop: '14px', textAlign: 'center' }}>
                 The barcode is usually on the back or bottom of the package
               </p>
             </form>
@@ -290,13 +342,43 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
         )}
       </div>
 
-      {/* Bottom Button */}
-      <div className="bg-black p-4 flex-shrink-0">
+      {/* Bottom Buttons */}
+      <div style={{ padding: '12px 16px', flexShrink: 0, display: 'flex', gap: '10px' }}>
         <button
           onClick={toggleManualEntry}
-          className="w-full text-white py-3 border border-white/50 rounded-lg"
+          style={{
+            flex: 1,
+            padding: '14px',
+            borderRadius: '14px',
+            background: 'rgba(255,255,255,0.08)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            color: 'white',
+            fontWeight: 600,
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+          }}
         >
-          {manualEntry ? '📷 Use Camera' : '⌨️ Enter Manually'}
+          {manualEntry ? (
+            <>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              Use Camera
+            </>
+          ) : (
+            <>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              Enter Manually
+            </>
+          )}
         </button>
       </div>
     </div>

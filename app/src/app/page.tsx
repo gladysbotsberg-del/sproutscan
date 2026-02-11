@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Scanner from '@/components/Scanner';
 import ProductResult from '@/components/ProductResult';
 import Onboarding from '@/components/Onboarding';
+import { SproutScanIcon } from '@/components/SproutScanIcon';
+import { SproutScanWordmark } from '@/components/SproutScanWordmark';
+import SafetyBadge from '@/components/SafetyBadge';
 
 export type Trimester = 1 | 2 | 3;
 
@@ -46,14 +49,15 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [recentScans, setRecentScans] = useState<SafetyResult[]>([]);
+  const [manualSearch, setManualSearch] = useState(false);
+  const [searchBarcode, setSearchBarcode] = useState('');
 
-  // Load profile and recent scans from localStorage
   useEffect(() => {
-    const savedProfile = localStorage.getItem('mamasense_profile');
+    const savedProfile = localStorage.getItem('sproutscan_profile');
     if (savedProfile) {
       setProfile(JSON.parse(savedProfile));
     }
-    const savedScans = localStorage.getItem('mamasense_recent');
+    const savedScans = localStorage.getItem('sproutscan_recent');
     if (savedScans) {
       setRecentScans(JSON.parse(savedScans).slice(0, 5));
     }
@@ -61,28 +65,28 @@ export default function Home() {
 
   const handleProfileComplete = (newProfile: UserProfile) => {
     setProfile(newProfile);
-    localStorage.setItem('mamasense_profile', JSON.stringify(newProfile));
+    localStorage.setItem('sproutscan_profile', JSON.stringify(newProfile));
   };
 
   const handleScan = async (barcode: string) => {
     setLoading(true);
     setError(null);
     setScanning(false);
-    
+    setManualSearch(false);
+
     try {
       const response = await fetch(`/api/scan?barcode=${barcode}&trimester=${profile?.trimester || 2}`);
       const data = await response.json();
-      
+
       if (data.error) {
         setError(data.message || data.error);
       } else {
         setResult(data);
-        // Save to recent scans
         const updated = [data, ...recentScans.filter(s => s.product.barcode !== data.product.barcode)].slice(0, 5);
         setRecentScans(updated);
-        localStorage.setItem('mamasense_recent', JSON.stringify(updated));
+        localStorage.setItem('sproutscan_recent', JSON.stringify(updated));
       }
-    } catch (err) {
+    } catch {
       setError('Failed to analyze product. Please try again.');
     } finally {
       setLoading(false);
@@ -96,31 +100,31 @@ export default function Home() {
 
   const changeTrimester = () => {
     setProfile(null);
-    localStorage.removeItem('mamasense_profile');
+    localStorage.removeItem('sproutscan_profile');
   };
 
-  // Show onboarding if no profile
   if (!profile) {
     return <Onboarding onComplete={handleProfileComplete} />;
   }
 
   return (
-    <main className="min-h-screen" style={{ background: 'var(--mama-cream)' }}>
+    <main className="min-h-screen">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b" style={{ borderColor: 'var(--border-light)' }}>
+      <header
+        className="bg-white/80 backdrop-blur-md sticky top-0 z-10"
+        style={{ borderBottom: '1px solid rgba(232,131,107,0.07)' }}
+      >
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: 'var(--mama-coral-light)' }}>
-              <span className="text-xl">🤰</span>
-            </div>
-            <span className="text-xl font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-              MamaSense
+            <SproutScanIcon size={32} />
+            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)' }}>
+              Sprout<span style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scan</span>
             </span>
           </div>
-          <button 
+          <button
             onClick={changeTrimester}
             className="text-sm px-3 py-1.5 rounded-full font-medium transition-colors"
-            style={{ background: 'var(--mama-coral-light)', color: 'var(--mama-coral)' }}
+            style={{ background: 'var(--brand-coral-pale)', color: 'var(--brand-coral)' }}
           >
             Trimester {profile.trimester}
           </button>
@@ -130,18 +134,20 @@ export default function Home() {
       <div className="max-w-md mx-auto px-4 py-6">
         {/* Error State */}
         {error && (
-          <div className="rounded-2xl p-5 mb-6" style={{ background: 'var(--avoid-red-light)' }}>
+          <div className="rounded-2xl p-5 mb-6" style={{ background: 'var(--safety-avoid-bg)', border: '1px solid var(--safety-avoid-border)' }}>
             <div className="flex items-start gap-3">
-              <span className="text-2xl">😕</span>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--safety-avoid-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--safety-avoid-text)" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+              </div>
               <div>
                 <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>Product not found</p>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{error}</p>
               </div>
             </div>
-            <button 
+            <button
               onClick={resetScan}
               className="mt-4 w-full py-2.5 rounded-xl font-semibold transition-colors btn-press"
-              style={{ background: 'white', color: 'var(--avoid-red)' }}
+              style={{ background: 'white', color: 'var(--safety-avoid-text)' }}
             >
               Try Another Product
             </button>
@@ -152,13 +158,13 @@ export default function Home() {
         {loading && (
           <div className="text-center py-16">
             <div className="relative w-20 h-20 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-4 border-gray-200"></div>
-              <div 
+              <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--bg-blush)' }}></div>
+              <div
                 className="absolute inset-0 rounded-full border-4 border-t-transparent animate-spin"
-                style={{ borderColor: 'var(--mama-coral)', borderTopColor: 'transparent' }}
+                style={{ borderColor: 'var(--brand-coral)', borderTopColor: 'transparent' }}
               ></div>
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-3xl">🔍</span>
+                <SproutScanIcon size={32} />
               </div>
             </div>
             <p className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>Analyzing ingredients...</p>
@@ -176,80 +182,203 @@ export default function Home() {
           <Scanner onScan={handleScan} onClose={() => setScanning(false)} />
         )}
 
-        {/* Home View */}
-        {!scanning && !loading && !result && !error && (
-          <div className="space-y-8">
-            {/* Hero Section */}
-            <div className="text-center pt-6 pb-4">
-              <div 
-                className="w-28 h-28 rounded-3xl mx-auto flex items-center justify-center mb-5 shadow-lg"
-                style={{ background: 'linear-gradient(135deg, var(--mama-coral-light) 0%, white 100%)' }}
-              >
-                <span className="text-5xl">📷</span>
+        {/* Manual Search Modal */}
+        {manualSearch && !loading && !result && !scanning && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
+            <div style={{ background: 'white', borderRadius: '20px', padding: '24px', width: '100%', maxWidth: '380px', boxShadow: 'var(--shadow-card)' }}>
+              <div className="flex items-center justify-between mb-4">
+                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '18px', color: 'var(--text-primary)' }}>Search by Barcode</h3>
+                <button onClick={() => setManualSearch(false)} style={{ color: 'var(--text-muted)', fontSize: '24px', lineHeight: 1 }}>&times;</button>
               </div>
-              <h2 
-                className="text-2xl font-bold mb-2" 
-                style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
-              >
-                Know what's safe
+              <form onSubmit={(e) => { e.preventDefault(); if (searchBarcode.trim()) handleScan(searchBarcode.trim()); }}>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={searchBarcode}
+                  onChange={(e) => setSearchBarcode(e.target.value)}
+                  placeholder="e.g., 049000006346"
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    borderRadius: '12px',
+                    border: '1.5px solid var(--bg-blush)',
+                    fontSize: '16px',
+                    outline: 'none',
+                    marginBottom: '12px',
+                    fontFamily: 'Inter, system-ui',
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={!searchBarcode.trim()}
+                  className="btn-press"
+                  style={{
+                    width: '100%',
+                    padding: '14px',
+                    borderRadius: '14px',
+                    background: searchBarcode.trim() ? 'linear-gradient(135deg, #E8836B, #D4567A)' : '#E0E0E0',
+                    color: 'white',
+                    fontWeight: 700,
+                    fontSize: '16px',
+                    border: 'none',
+                    cursor: searchBarcode.trim() ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  Check Product
+                </button>
+                <p style={{ fontSize: '12px', color: 'var(--text-hint)', textAlign: 'center', marginTop: '12px' }}>
+                  The barcode is usually on the back or bottom of the package
+                </p>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Home View */}
+        {!scanning && !loading && !result && !error && !manualSearch && (
+          <div className="space-y-7">
+            {/* Wordmark */}
+            <div className="text-center pt-6 pb-2">
+              <div className="flex justify-center">
+                <SproutScanWordmark scale={1.15} />
+              </div>
+            </div>
+
+            {/* Hero Illustration — 3-step flow */}
+            <div className="flex items-center justify-center gap-2 py-4">
+              {/* Step 1: Scan */}
+              <div className="flex flex-col items-center">
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--brand-coral-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--brand-coral)" strokeWidth="2">
+                    <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2" />
+                    <line x1="7" y1="12" x2="17" y2="12" strokeWidth="2.5" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginTop: '6px' }}>Scan</span>
+              </div>
+
+              {/* Arrow */}
+              <svg width="24" height="12" viewBox="0 0 24 12" style={{ marginBottom: 16 }}>
+                <line x1="0" y1="6" x2="18" y2="6" stroke="var(--brand-coral-light)" strokeWidth="2" strokeDasharray="3 3" />
+                <path d="M16 2l4 4-4 4" stroke="var(--brand-coral-light)" strokeWidth="2" fill="none" />
+              </svg>
+
+              {/* Step 2: Check */}
+              <div className="flex flex-col items-center">
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--brand-coral-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="var(--brand-coral)" />
+                    <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginTop: '6px' }}>Check</span>
+              </div>
+
+              {/* Arrow */}
+              <svg width="24" height="12" viewBox="0 0 24 12" style={{ marginBottom: 16 }}>
+                <line x1="0" y1="6" x2="18" y2="6" stroke="var(--brand-coral-light)" strokeWidth="2" strokeDasharray="3 3" />
+                <path d="M16 2l4 4-4 4" stroke="var(--brand-coral-light)" strokeWidth="2" fill="none" />
+              </svg>
+
+              {/* Step 3: Nourish */}
+              <div className="flex flex-col items-center">
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--green-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <line x1="12" y1="22" x2="12" y2="8" stroke="var(--green-forest)" strokeWidth="2.5" strokeLinecap="round" />
+                    <path d="M12,12 C9,10 5,6 3,2 C8,2 11,8 13,11" fill="var(--green-primary)" />
+                    <path d="M12,9 C15,6 19,3 21,2 C21,7 17,11 14,13" fill="var(--green-primary)" opacity="0.75" />
+                  </svg>
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-muted)', marginTop: '6px' }}>Nourish</span>
+              </div>
+            </div>
+
+            {/* Headline */}
+            <div className="text-center">
+              <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '28px', color: 'var(--text-primary)', lineHeight: 1.2 }}>
+                Know what&apos;s safe
+                <br />
+                <span style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  for you & baby
+                </span>
               </h2>
-              <p style={{ color: 'var(--text-secondary)' }}>
-                Scan any product to check if it's safe during your pregnancy
+              <p style={{ color: 'var(--text-secondary)', fontSize: '15px', marginTop: '10px', lineHeight: 1.5 }}>
+                Scan any food product. Get instant, trimester-specific safety guidance backed by medical research.
               </p>
             </div>
 
-            {/* Scan Button */}
-            <button
-              onClick={() => setScanning(true)}
-              className="w-full py-5 rounded-2xl font-bold text-lg text-white shadow-xl btn-press scan-pulse"
-              style={{ background: 'linear-gradient(135deg, var(--mama-coral) 0%, #E8927A 100%)' }}
-            >
-              <span className="flex items-center justify-center gap-3">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                </svg>
-                Scan Product
-              </span>
-            </button>
+            {/* CTAs */}
+            <div className="space-y-3">
+              <button
+                onClick={() => setScanning(true)}
+                className="w-full py-4 font-bold text-lg text-white btn-press scan-pulse"
+                style={{ background: 'linear-gradient(135deg, #E8836B, #D4567A)', borderRadius: '14px', boxShadow: 'var(--shadow-button)', border: 'none' }}
+              >
+                <span className="flex items-center justify-center gap-3">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2" />
+                    <line x1="7" y1="12" x2="17" y2="12" />
+                  </svg>
+                  Scan a Product
+                </span>
+              </button>
+              <button
+                onClick={() => { setManualSearch(true); setSearchBarcode(''); }}
+                className="w-full py-4 font-bold text-base btn-press"
+                style={{ background: 'transparent', border: '2px solid var(--brand-coral)', borderRadius: '14px', color: 'var(--brand-coral)' }}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                  Search by Name
+                </span>
+              </button>
+            </div>
 
-            {/* Safety Legend */}
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-white rounded-2xl p-4 text-center shadow-sm card-hover">
-                <div 
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ background: 'var(--safe-green-light)' }}
-                >
-                  <span className="text-xl">✓</span>
-                </div>
-                <span className="text-sm font-semibold" style={{ color: 'var(--safe-green)' }}>Safe</span>
-              </div>
-              <div className="bg-white rounded-2xl p-4 text-center shadow-sm card-hover">
-                <div 
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ background: 'var(--caution-amber-light)' }}
-                >
-                  <span className="text-xl">!</span>
-                </div>
-                <span className="text-sm font-semibold" style={{ color: 'var(--caution-amber)' }}>Caution</span>
-              </div>
-              <div className="bg-white rounded-2xl p-4 text-center shadow-sm card-hover">
-                <div 
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ background: 'var(--avoid-red-light)' }}
-                >
-                  <span className="text-xl">✗</span>
-                </div>
-                <span className="text-sm font-semibold" style={{ color: 'var(--avoid-red)' }}>Avoid</span>
-              </div>
+            {/* Feature Cards */}
+            <div className="space-y-3">
+              <FeatureCard
+                icon={
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <path d="M3 7V5a2 2 0 012-2h2M17 3h2a2 2 0 012 2v2M21 17v2a2 2 0 01-2 2h-2M7 21H5a2 2 0 01-2-2v-2" />
+                    <line x1="7" y1="12" x2="17" y2="12" />
+                  </svg>
+                }
+                iconBg="var(--brand-coral)"
+                title="Scan Any Barcode"
+                description="Point your camera at any food product barcode for instant analysis"
+              />
+              <FeatureCard
+                icon={
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                }
+                iconBg="var(--brand-rose)"
+                title="Trimester-Specific"
+                description="Safety guidance tailored to your current stage of pregnancy"
+              />
+              <FeatureCard
+                icon={
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="M9 12l2 2 4-4" />
+                  </svg>
+                }
+                iconBg="var(--green-primary)"
+                title="415 Ingredients Checked"
+                description="Comprehensive database backed by FDA, ACOG, and WHO guidelines"
+              />
             </div>
 
             {/* Recent Scans */}
             {recentScans.length > 0 && (
               <div>
-                <h3 
-                  className="font-bold mb-3 px-1" 
-                  style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
-                >
+                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '16px', color: 'var(--text-primary)', marginBottom: '10px', paddingLeft: '2px' }}>
                   Recent Scans
                 </h3>
                 <div className="space-y-2">
@@ -257,39 +386,23 @@ export default function Home() {
                     <button
                       key={scan.product.barcode + i}
                       onClick={() => setResult(scan)}
-                      className="w-full bg-white rounded-xl p-3 flex items-center gap-3 shadow-sm card-hover text-left"
+                      className="w-full rounded-2xl p-3 flex items-center gap-3 card-hover text-left"
+                      style={{ background: 'white', border: '1px solid rgba(232,131,107,0.07)', boxShadow: 'var(--shadow-card)' }}
                     >
                       {scan.product.image ? (
-                        <img 
-                          src={scan.product.image} 
-                          alt="" 
-                          className="w-12 h-12 rounded-lg object-cover"
-                        />
+                        <img src={scan.product.image} alt="" className="w-12 h-12 rounded-lg object-cover" />
                       ) : (
-                        <div 
-                          className="w-12 h-12 rounded-lg flex items-center justify-center"
-                          style={{ background: 'var(--border-light)' }}
-                        >
-                          <span className="text-xl">📦</span>
+                        <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'var(--bg-warm)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-hint)" strokeWidth="1.5">
+                            <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                          </svg>
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-                          {scan.product.name}
-                        </p>
-                        <p className="text-sm truncate" style={{ color: 'var(--text-muted)' }}>
-                          {scan.product.brand}
-                        </p>
+                        <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{scan.product.name}</p>
+                        <p className="text-sm truncate" style={{ color: 'var(--text-muted)' }}>{scan.product.brand}</p>
                       </div>
-                      <div 
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                          scan.overallSafety === 'safe' ? 'badge-safe' : 
-                          scan.overallSafety === 'caution' ? 'badge-caution' : 
-                          'badge-avoid'
-                        }`}
-                      >
-                        {scan.overallSafety === 'safe' ? '✓' : scan.overallSafety === 'caution' ? '!' : '✗'}
-                      </div>
+                      <SafetyBadge rating={scan.overallSafety} size="sm" />
                     </button>
                   ))}
                 </div>
@@ -297,17 +410,39 @@ export default function Home() {
             )}
 
             {/* Trust Footer */}
-            <div className="text-center pt-4 pb-8">
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                Data from USDA FoodData Central & Open Food Facts
-              </p>
-              <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                Based on FDA, NIH & ACOG guidelines
+            <div className="text-center pt-2 pb-8">
+              <p style={{ fontSize: '12px', color: 'var(--text-hint)' }}>
+                Based on guidelines from ACOG, FDA, and WHO
               </p>
             </div>
           </div>
         )}
       </div>
     </main>
+  );
+}
+
+function FeatureCard({ icon, iconBg, title, description }: { icon: React.ReactNode; iconBg: string; title: string; description: string }) {
+  return (
+    <div
+      style={{
+        background: 'white',
+        borderRadius: '18px',
+        border: '1px solid rgba(232,131,107,0.07)',
+        boxShadow: 'var(--shadow-card)',
+        padding: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+      }}
+    >
+      <div style={{ width: 42, height: 42, borderRadius: '12px', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+        {icon}
+      </div>
+      <div>
+        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '15px', color: 'var(--text-primary)' }}>{title}</div>
+        <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '2px', lineHeight: 1.4 }}>{description}</div>
+      </div>
+    </div>
   );
 }
