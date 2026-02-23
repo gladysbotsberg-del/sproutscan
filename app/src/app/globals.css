@@ -25,6 +25,9 @@
   --safety-avoid-bg: #FFEBEE;
   --safety-avoid-text: #C62828;
   --safety-avoid-border: #EF9A9A;
+  --safety-info-bg: #E3F2FD;
+  --safety-info-text: #1565C0;
+  --safety-info-border: #90CAF9;
 
   /* Neutrals (warm-tinted) */
   --text-primary: #3D2C2C;

@@ -52,6 +52,7 @@ export interface SafetyResult {
   flaggedIngredients: FlaggedIngredient[];
   safeIngredients: string[];
   unknownIngredients: string[];
+  infoIngredients?: InfoIngredient[];
   noIngredients?: boolean;
   message?: string;
 }
@@ -62,6 +63,11 @@ export interface FlaggedIngredient {
   concern: string;
   explanation: string;
   bottomLine: string;
+}
+
+export interface InfoIngredient {
+  name: string;
+  note: string;
 }
 
 export default function Home() {

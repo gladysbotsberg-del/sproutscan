@@ -1,6 +1,6 @@
 'use client';
 
-import { SafetyResult, FlaggedIngredient } from '@/app/page';
+import { SafetyResult, FlaggedIngredient, InfoIngredient } from '@/app/page';
 import { useState } from 'react';
 import SafetyBadge from './SafetyBadge';
 
@@ -298,6 +298,47 @@ export default function ProductResult({ result, onScanAnother, onManualIngredien
               />
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Informational Ingredients (e.g. seed oils) */}
+      {result.infoIngredients && result.infoIngredients.length > 0 && (
+        <div
+          style={{
+            background: 'white',
+            borderRadius: '18px',
+            overflow: 'hidden',
+            border: '1px solid rgba(232,131,107,0.07)',
+            boxShadow: 'var(--shadow-card)',
+          }}
+        >
+          <div className="px-4 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--bg-blush)' }}>
+            <div
+              className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
+              style={{ background: 'var(--safety-info-bg)', color: 'var(--safety-info-text)' }}
+            >
+              i
+            </div>
+            <h4
+              className="font-bold"
+              style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
+            >
+              Good to Know
+            </h4>
+            <span className="ml-auto">
+              <SafetyBadge rating="info" size="sm" />
+            </span>
+          </div>
+          {result.infoIngredients.map((info, idx) => (
+            <div key={idx} className="p-4" style={{ borderTop: idx > 0 ? '1px solid var(--bg-blush)' : 'none' }}>
+              <p className="text-sm font-semibold mb-1" style={{ color: 'var(--safety-info-text)' }}>
+                {info.name}
+              </p>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                {info.note}
+              </p>
+            </div>
+          ))}
         </div>
       )}
 

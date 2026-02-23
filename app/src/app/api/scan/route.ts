@@ -493,6 +493,14 @@ function parseIngredients(ingredientsText: string): string[] {
     .filter(i => i.length > 1 && i.length < 60);
 }
 
+// Seed oils to flag as informational (not a safety concern)
+const SEED_OIL_KEYWORDS = [
+  'sunflower oil', 'canola oil', 'soybean oil', 'corn oil',
+  'safflower oil', 'grapeseed oil', 'cottonseed oil', 'rice bran oil',
+];
+
+const SEED_OIL_NOTE = 'This product contains seed oils. These are common cooking oils \u2014 there is ongoing debate about their health effects, but they are not flagged as unsafe during pregnancy by major health organizations.';
+
 function analyzeIngredients(ingredients: string[], trimester: number) {
   // TODO: Breastfeeding mode — when `trimester` is replaced with a stage identifier,
   // add breastfeeding-specific safety rules here. Key differences from pregnancy:
@@ -508,6 +516,7 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
   const safeIngredients: string[] = [];
   const safeNames = new Set<string>();
   const unknownIngredients: string[] = [];
+  const detectedSeedOils: string[] = [];
 
   const safeDB = ingredientsDB.safeIngredients as SafeIngredient[];
   const concerningDB = ingredientsDB.concerningIngredients as ConcerningIngredient[];
@@ -515,6 +524,15 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
   for (const rawIngredient of ingredients) {
     const ingredient = rawIngredient.trim();
     if (ingredient.length < 2) continue;
+
+    // Check for seed oils (informational only)
+    const normLower = ingredient.toLowerCase();
+    for (const oil of SEED_OIL_KEYWORDS) {
+      if (normLower.includes(oil)) {
+        detectedSeedOils.push(ingredient);
+        break;
+      }
+    }
 
     // First check concerning ingredients
     const concerningMatch = findConcerningMatch(ingredient, concerningDB);
@@ -561,13 +579,24 @@ function analyzeIngredients(ingredients: string[], trimester: number) {
     overallSafety = 'caution';
   }
 
-  console.log(`[SproutScan] Analysis: ${safeIngredients.length} safe, ${flaggedIngredients.length} flagged, ${unknownIngredients.length} unknown`);
+  // Build info ingredients (seed oils) — does NOT affect overallSafety
+  const infoIngredients: { name: string; note: string }[] = [];
+  if (detectedSeedOils.length > 0) {
+    const uniqueOils = [...new Set(detectedSeedOils)];
+    infoIngredients.push({
+      name: uniqueOils.join(', '),
+      note: SEED_OIL_NOTE,
+    });
+  }
+
+  console.log(`[SproutScan] Analysis: ${safeIngredients.length} safe, ${flaggedIngredients.length} flagged, ${unknownIngredients.length} unknown, ${infoIngredients.length} info`);
 
   return {
     overallSafety,
     flaggedIngredients,
     safeIngredients,
     unknownIngredients,
+    infoIngredients,
   };
 }
 

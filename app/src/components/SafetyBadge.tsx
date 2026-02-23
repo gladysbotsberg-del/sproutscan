@@ -1,5 +1,5 @@
 interface SafetyBadgeProps {
-  rating: 'safe' | 'caution' | 'avoid' | 'unknown';
+  rating: 'safe' | 'caution' | 'avoid' | 'unknown' | 'info';
   size?: 'sm' | 'md' | 'lg';
 }
 
@@ -31,6 +31,13 @@ const config = {
     border: '#E0E0E0',
     icon: '?',
     label: 'Unknown',
+  },
+  info: {
+    bg: 'var(--safety-info-bg)',
+    text: 'var(--safety-info-text)',
+    border: 'var(--safety-info-border)',
+    icon: 'i',
+    label: 'Info',
   },
 };
 
