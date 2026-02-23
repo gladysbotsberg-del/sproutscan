@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Trimester, UserProfile, DietaryRestriction } from '@/app/page';
+import { Trimester, Stage, UserProfile, DietaryRestriction } from '@/app/page';
 import { SproutScanWordmark } from './SproutScanWordmark';
 
 interface OnboardingProps {
@@ -57,19 +57,24 @@ function GestDiabetesIcon() {
 
 export default function Onboarding({ onComplete }: OnboardingProps) {
   const [step, setStep] = useState(1);
-  const [trimester, setTrimester] = useState<Trimester | null>(null);
+  const [stage, setStage] = useState<Stage | null>(null);
   const [dueDate, setDueDate] = useState('');
   const [dietaryRestrictions, setDietaryRestrictions] = useState<DietaryRestriction[]>([]);
 
-  const handleTrimesterSelect = (t: Trimester) => {
-    setTrimester(t);
-    setTimeout(() => setStep(3), 300);
+  const handleStageSelect = (s: Stage) => {
+    setStage(s);
+    // Breastfeeding doesn't need a due date — skip to dietary restrictions
+    if (s === 'breastfeeding') {
+      setTimeout(() => setStep(4), 300);
+    } else {
+      setTimeout(() => setStep(3), 300);
+    }
   };
 
   const handleDueDateContinue = () => {
     if (dueDate) {
       const { trimester: calc } = calculateTrimesterFromDueDate(dueDate);
-      setTrimester(calc);
+      setStage(calc);
     }
     setStep(4);
   };
@@ -81,9 +86,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const handleComplete = () => {
-    if (!trimester) return;
+    if (!stage) return;
     onComplete({
-      trimester,
+      stage,
       dueDate: dueDate || undefined,
       dietaryRestrictions: dietaryRestrictions.length > 0 ? dietaryRestrictions : undefined,
     });
@@ -198,7 +203,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           </div>
         )}
 
-        {/* Step 2: Trimester */}
+        {/* Step 2: Stage selector */}
         {step === 2 && (
           <div className="text-center max-w-sm w-full step-enter" key="step2">
             <div
@@ -217,36 +222,44 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               className="text-2xl font-bold mb-2"
               style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}
             >
-              Which trimester?
+              What&apos;s your stage?
             </h2>
             <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
               This helps us give you the most relevant safety information
             </p>
 
             <div className="space-y-3">
-              <TrimesterButton
-                trimester={1}
-                weeks="Weeks 1-12"
-                description="First trimester"
+              <StageButton
+                stage={1}
+                detail="Weeks 1-12"
+                label="First trimester"
                 icon={<SeedlingIcon />}
-                selected={trimester === 1}
-                onSelect={() => handleTrimesterSelect(1)}
+                selected={stage === 1}
+                onSelect={() => handleStageSelect(1)}
               />
-              <TrimesterButton
-                trimester={2}
-                weeks="Weeks 13-26"
-                description="Second trimester"
+              <StageButton
+                stage={2}
+                detail="Weeks 13-26"
+                label="Second trimester"
                 icon={<LeafIcon />}
-                selected={trimester === 2}
-                onSelect={() => handleTrimesterSelect(2)}
+                selected={stage === 2}
+                onSelect={() => handleStageSelect(2)}
               />
-              <TrimesterButton
-                trimester={3}
-                weeks="Weeks 27-40"
-                description="Third trimester"
+              <StageButton
+                stage={3}
+                detail="Weeks 27-40"
+                label="Third trimester"
                 icon={<TreeIcon />}
-                selected={trimester === 3}
-                onSelect={() => handleTrimesterSelect(3)}
+                selected={stage === 3}
+                onSelect={() => handleStageSelect(3)}
+              />
+              <StageButton
+                stage="breastfeeding"
+                detail="Postpartum"
+                label="Breastfeeding"
+                icon={<BreastfeedingIcon />}
+                selected={stage === 'breastfeeding'}
+                onSelect={() => handleStageSelect('breastfeeding')}
               />
             </div>
           </div>
@@ -311,7 +324,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   borderRadius: '10px',
                 }}
               >
-                You&apos;re in your {dueDateInfo.trimester === 1 ? '1st' : dueDateInfo.trimester === 2 ? '2nd' : '3rd'} trimester (week {dueDateInfo.weeks})
+                You&apos;re in your {dueDateInfo.trimester === 1 ? '1st' : dueDateInfo.trimester === 2 ? '2nd' : '3rd'} trimester &mdash; week {dueDateInfo.weeks}
               </p>
             )}
 
@@ -487,21 +500,23 @@ function TreeIcon() {
   );
 }
 
-function TrimesterButton({
-  trimester,
-  weeks,
+function StageButton({
+  stage,
+  detail,
   icon,
-  description,
+  label,
   selected,
   onSelect,
 }: {
-  trimester: number;
-  weeks: string;
+  stage: Stage;
+  detail: string;
   icon: React.ReactNode;
-  description: string;
+  label: string;
   selected: boolean;
   onSelect: () => void;
 }) {
+  const badgeText = typeof stage === 'number' ? String(stage) : '\u2661';
+
   return (
     <button
       onClick={onSelect}
@@ -517,13 +532,13 @@ function TrimesterButton({
           className="w-14 h-14 rounded-xl flex items-center justify-center"
           style={{ background: selected ? 'var(--brand-gradient)' : 'var(--bg-blush)' }}
         >
-          {selected ? <span className="text-white font-bold text-lg">{trimester}</span> : icon}
+          {selected ? <span className="text-white font-bold text-lg">{badgeText}</span> : icon}
         </div>
         <div>
           <div className="font-bold" style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)' }}>
-            {description}
+            {label}
           </div>
-          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>{weeks}</div>
+          <div className="text-sm" style={{ color: 'var(--text-muted)' }}>{detail}</div>
         </div>
         {selected && (
           <div
@@ -535,5 +550,14 @@ function TrimesterButton({
         )}
       </div>
     </button>
+  );
+}
+
+function BreastfeedingIcon() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="var(--brand-coral-light)" />
+      <circle cx="12" cy="10" r="3" fill="var(--brand-coral)" opacity="0.6" />
+    </svg>
   );
 }

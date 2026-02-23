@@ -7,10 +7,28 @@ import SafetyBadge from './SafetyBadge';
 interface ProductResultProps {
   result: SafetyResult;
   onScanAnother: () => void;
+  onManualIngredients?: (ingredientsText: string) => void;
 }
 
-export default function ProductResult({ result, onScanAnother }: ProductResultProps) {
+export default function ProductResult({ result, onScanAnother, onManualIngredients }: ProductResultProps) {
   const [expandedIngredient, setExpandedIngredient] = useState<string | null>(null);
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [manualText, setManualText] = useState('');
+  const [manualLoading, setManualLoading] = useState(false);
+  const [manualError, setManualError] = useState<string | null>(null);
+
+  const handleManualSubmit = async () => {
+    if (!manualText.trim() || !onManualIngredients) return;
+    setManualLoading(true);
+    setManualError(null);
+    try {
+      await onManualIngredients(manualText.trim());
+    } catch {
+      setManualError('Failed to analyze. Please try again.');
+    } finally {
+      setManualLoading(false);
+    }
+  };
 
   const safetyConfig: Record<string, { bg: string; icon: string; label: string; color: string; border: string }> = {
     safe: {
@@ -130,25 +148,122 @@ export default function ProductResult({ result, onScanAnother }: ProductResultPr
         </p>
       </div>
 
-      {/* No Ingredients Message */}
-      {result.noIngredients && result.message && (
-        <div
-          style={{
-            borderRadius: '18px',
-            padding: '16px',
-            background: 'var(--safety-caution-bg)',
-            border: '1.5px solid var(--safety-caution-border)',
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--safety-caution-text)" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="16" x2="12" y2="12" />
-              <line x1="12" y1="8" x2="12.01" y2="8" />
-            </svg>
-            <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{result.message}</p>
-          </div>
-        </div>
+      {/* No Ingredients Message + Manual Entry */}
+      {result.noIngredients && (
+        <>
+          {result.message && !showManualEntry && (
+            <div
+              style={{
+                borderRadius: '18px',
+                padding: '16px',
+                background: 'var(--safety-caution-bg)',
+                border: '1.5px solid var(--safety-caution-border)',
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--safety-caution-text)" strokeWidth="2" style={{ flexShrink: 0, marginTop: 2 }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+                <p className="text-sm" style={{ color: 'var(--text-primary)' }}>{result.message}</p>
+              </div>
+            </div>
+          )}
+
+          {!showManualEntry ? (
+            <button
+              onClick={() => setShowManualEntry(true)}
+              className="w-full py-4 rounded-2xl font-bold text-white btn-press"
+              style={{
+                background: 'var(--brand-gradient)',
+                boxShadow: 'var(--shadow-button)',
+                border: 'none',
+                fontSize: '16px',
+              }}
+            >
+              <span className="flex items-center justify-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                Type Ingredients Manually
+              </span>
+            </button>
+          ) : (
+            <div
+              style={{
+                borderRadius: '18px',
+                padding: '20px',
+                background: 'white',
+                border: '1px solid rgba(232,131,107,0.07)',
+                boxShadow: 'var(--shadow-card)',
+              }}
+            >
+              <h4
+                className="font-bold mb-3"
+                style={{ fontFamily: 'var(--font-display)', color: 'var(--text-primary)', fontSize: '16px' }}
+              >
+                Enter Ingredients
+              </h4>
+              <textarea
+                value={manualText}
+                onChange={(e) => setManualText(e.target.value)}
+                placeholder="Paste or type the ingredient list from the package..."
+                autoFocus
+                rows={5}
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  borderRadius: '12px',
+                  border: '1.5px solid var(--bg-blush)',
+                  fontSize: '14px',
+                  fontFamily: 'Inter, system-ui',
+                  resize: 'vertical',
+                  outline: 'none',
+                  lineHeight: 1.5,
+                }}
+              />
+              {manualError && (
+                <p className="text-sm mt-2" style={{ color: 'var(--safety-avoid-text)' }}>{manualError}</p>
+              )}
+              <div className="flex items-center gap-3 mt-3">
+                <button
+                  onClick={handleManualSubmit}
+                  disabled={!manualText.trim() || manualLoading}
+                  className="flex-1 py-3 rounded-xl font-bold text-white btn-press"
+                  style={{
+                    background: manualText.trim() && !manualLoading ? 'var(--brand-gradient)' : '#E0E0E0',
+                    border: 'none',
+                    fontSize: '15px',
+                    cursor: manualText.trim() && !manualLoading ? 'pointer' : 'not-allowed',
+                  }}
+                >
+                  {manualLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <circle cx="12" cy="12" r="10" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+                      </svg>
+                      Analyzing...
+                    </span>
+                  ) : (
+                    'Check Ingredients'
+                  )}
+                </button>
+                <button
+                  onClick={() => { setShowManualEntry(false); setManualText(''); setManualError(null); }}
+                  className="py-3 px-4 font-medium"
+                  style={{ color: 'var(--text-muted)', fontSize: '15px', background: 'none', border: 'none' }}
+                >
+                  Cancel
+                </button>
+              </div>
+              <p className="text-xs mt-3" style={{ color: 'var(--text-hint)' }}>
+                Tip: Copy the ingredients list exactly as shown on the package, separated by commas.
+              </p>
+            </div>
+          )}
+        </>
       )}
 
       {/* Flagged Ingredients */}

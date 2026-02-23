@@ -21,6 +21,9 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
   const isRunningRef = useRef(false);
   const mountedRef = useRef(true);
   const lastScannedRef = useRef<string | null>(null);
+  const readCountRef = useRef<Record<string, number>>({});
+
+  const REQUIRED_READS = 3; // barcode must be detected this many times before accepting
 
   const stopScanner = useCallback(() => {
     if (isRunningRef.current) {
@@ -70,6 +73,7 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
 
     mountedRef.current = true;
     lastScannedRef.current = null;
+    readCountRef.current = {};
 
     const initScanner = async () => {
       const container = scannerRef.current;
@@ -144,8 +148,15 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
           const code = result.codeResult?.code;
           if (!code) return;
 
+          // Skip if we already accepted this barcode
           if (lastScannedRef.current === code) return;
+
+          // Require multiple consistent reads to avoid misreads
+          readCountRef.current[code] = (readCountRef.current[code] || 0) + 1;
+          if (readCountRef.current[code] < REQUIRED_READS) return;
+
           lastScannedRef.current = code;
+          readCountRef.current = {};
 
           stopScanner();
           onScan(code);

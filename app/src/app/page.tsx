@@ -10,15 +10,31 @@ import SafetyBadge from '@/components/SafetyBadge';
 
 export type Trimester = 1 | 2 | 3;
 
+// Stage extends Trimester with postpartum stages.
+// TODO: When breastfeeding mode is built, add breastfeeding-specific safety rules
+// and update the API to accept stage directly instead of converting to trimester.
+export type Stage = Trimester | 'breastfeeding';
+
 export type DietaryRestriction =
   | 'vegetarian' | 'vegan' | 'gluten-free' | 'dairy-free'
   | 'nut-allergy' | 'soy-allergy' | 'egg-allergy' | 'shellfish-allergy'
   | 'gestational-diabetes' | 'lactose-intolerant';
 
 export interface UserProfile {
-  trimester: Trimester;
+  stage: Stage;
   dueDate?: string;
   dietaryRestrictions?: DietaryRestriction[];
+}
+
+/** Convert a Stage to a trimester number for the API (breastfeeding defaults to 3/postpartum). */
+export function stageToTrimester(stage: Stage): number {
+  return typeof stage === 'number' ? stage : 3;
+}
+
+/** Human-readable label for the header pill. */
+export function stageLabel(stage: Stage): string {
+  if (stage === 'breastfeeding') return 'Breastfeeding';
+  return `Trimester ${stage}`;
 }
 
 export interface ProductData {
@@ -61,7 +77,14 @@ export default function Home() {
   useEffect(() => {
     const savedProfile = localStorage.getItem('sproutscan_profile');
     if (savedProfile) {
-      setProfile(JSON.parse(savedProfile));
+      const parsed = JSON.parse(savedProfile);
+      // Migrate old profiles that used `trimester` instead of `stage`
+      if (parsed.trimester && !parsed.stage) {
+        parsed.stage = parsed.trimester;
+        delete parsed.trimester;
+        localStorage.setItem('sproutscan_profile', JSON.stringify(parsed));
+      }
+      setProfile(parsed);
     }
     const savedScans = localStorage.getItem('sproutscan_recent');
     if (savedScans) {
@@ -81,7 +104,7 @@ export default function Home() {
     setManualSearch(false);
 
     try {
-      const response = await fetch(`/api/scan?barcode=${barcode}&trimester=${profile?.trimester || 2}`);
+      const response = await fetch(`/api/scan?barcode=${barcode}&trimester=${stageToTrimester(profile?.stage || 2)}`);
       const data = await response.json();
 
       if (data.error) {
@@ -99,12 +122,45 @@ export default function Home() {
     }
   };
 
+  const handleManualIngredients = async (ingredientsText: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ingredients: ingredientsText,
+          trimester: stageToTrimester(profile?.stage || 2),
+          product: result?.product,
+        }),
+      });
+      const data = await response.json();
+
+      if (data.error) {
+        setError(data.error);
+        setResult(null);
+      } else {
+        setResult(data);
+        const updated = [data, ...recentScans.filter(s => s.product.barcode !== data.product.barcode)].slice(0, 5);
+        setRecentScans(updated);
+        localStorage.setItem('sproutscan_recent', JSON.stringify(updated));
+      }
+    } catch {
+      setError('Failed to analyze ingredients. Please try again.');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const resetScan = () => {
     setResult(null);
     setError(null);
   };
 
-  const changeTrimester = () => {
+  const changeStage = () => {
     setProfile(null);
     localStorage.removeItem('sproutscan_profile');
   };
@@ -128,11 +184,11 @@ export default function Home() {
             </span>
           </div>
           <button
-            onClick={changeTrimester}
+            onClick={changeStage}
             className="text-sm px-3 py-1.5 rounded-full font-medium transition-colors"
             style={{ background: 'var(--brand-coral-pale)', color: 'var(--brand-coral)' }}
           >
-            Trimester {profile.trimester}
+            {stageLabel(profile.stage)}
           </button>
         </div>
       </header>
@@ -180,7 +236,7 @@ export default function Home() {
 
         {/* Result View */}
         {result && !loading && (
-          <ProductResult result={result} onScanAnother={resetScan} />
+          <ProductResult result={result} onScanAnother={resetScan} onManualIngredients={handleManualIngredients} />
         )}
 
         {/* Scanner View */}

@@ -1,3 +1,4 @@
+import { Stage, stageLabel } from '@/app/page';
 import SafetyBadge from './SafetyBadge';
 
 interface ResultCardProps {
@@ -5,7 +6,7 @@ interface ResultCardProps {
   brand?: string;
   rating: 'safe' | 'caution' | 'avoid' | 'unknown';
   category?: string;
-  trimester?: number;
+  stage?: Stage;
   explanation?: string;
   image?: string | null;
 }
@@ -15,7 +16,7 @@ export default function ResultCard({
   brand,
   rating,
   category,
-  trimester,
+  stage,
   explanation,
   image,
 }: ResultCardProps) {
@@ -86,9 +87,9 @@ export default function ResultCard({
                 {category}
               </span>
             )}
-            {trimester && (
+            {stage && (
               <span style={{ fontSize: '11px', color: 'var(--text-hint)', background: 'var(--bg-warm)', padding: '2px 8px', borderRadius: '6px' }}>
-                Trimester {trimester}
+                {stageLabel(stage)}
               </span>
             )}
           </div>
