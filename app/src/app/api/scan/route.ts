@@ -147,15 +147,16 @@ function isSimilar(a: string, b: string): boolean {
 
   // Levenshtein edit distance — only for single-word comparisons to avoid
   // false positives like "sodium citrate" ≈ "sodium nitrite"
+  // Min length 6 to avoid short-word collisions like "salt" ≈ "salp"
   if (tokensA.length === 1 && tokensB.length === 1) {
     const depA = depluralize(normA);
     const depB = depluralize(normB);
     const maxLen = Math.max(depA.length, depB.length);
     const minLen = Math.min(depA.length, depB.length);
 
-    if (Math.abs(depA.length - depB.length) <= 2 && minLen >= 4) {
+    if (Math.abs(depA.length - depB.length) <= 2 && minLen >= 6) {
       const dist = levenshtein(depA, depB);
-      const threshold = maxLen <= 5 ? 1 : 2;
+      const threshold = maxLen <= 7 ? 1 : 2;
       if (dist <= threshold) return true;
     }
   }
