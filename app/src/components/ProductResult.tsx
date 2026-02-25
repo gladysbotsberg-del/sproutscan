@@ -3,6 +3,7 @@
 import { SafetyResult, FlaggedIngredient, InfoIngredient } from '@/app/page';
 import { useState } from 'react';
 import SafetyBadge from './SafetyBadge';
+import IngredientSnap from './IngredientSnap';
 
 interface ProductResultProps {
   result: SafetyResult;
@@ -16,6 +17,7 @@ export default function ProductResult({ result, onScanAnother, onManualIngredien
   const [manualText, setManualText] = useState('');
   const [manualLoading, setManualLoading] = useState(false);
   const [manualError, setManualError] = useState<string | null>(null);
+  const [showIngredientSnap, setShowIngredientSnap] = useState(false);
 
   const handleManualSubmit = async () => {
     if (!manualText.trim() || !onManualIngredients) return;
@@ -172,24 +174,44 @@ export default function ProductResult({ result, onScanAnother, onManualIngredien
           )}
 
           {!showManualEntry ? (
-            <button
-              onClick={() => setShowManualEntry(true)}
-              className="w-full py-4 rounded-2xl font-bold text-white btn-press"
-              style={{
-                background: 'var(--brand-gradient)',
-                boxShadow: 'var(--shadow-button)',
-                border: 'none',
-                fontSize: '16px',
-              }}
-            >
-              <span className="flex items-center justify-center gap-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                </svg>
-                Type Ingredients Manually
-              </span>
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={() => setShowIngredientSnap(true)}
+                className="w-full py-4 rounded-2xl font-bold text-white btn-press"
+                style={{
+                  background: 'var(--brand-gradient)',
+                  boxShadow: 'var(--shadow-button)',
+                  border: 'none',
+                  fontSize: '16px',
+                }}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
+                    <circle cx="12" cy="13" r="4" />
+                  </svg>
+                  Snap Ingredient List
+                </span>
+              </button>
+              <button
+                onClick={() => setShowManualEntry(true)}
+                className="w-full py-3 rounded-2xl font-semibold btn-press"
+                style={{
+                  background: 'transparent',
+                  border: '2px solid var(--brand-coral)',
+                  color: 'var(--brand-coral)',
+                  fontSize: '15px',
+                }}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                  Type Ingredients Manually
+                </span>
+              </button>
+            </div>
           ) : (
             <div
               style={{
@@ -425,6 +447,25 @@ export default function ProductResult({ result, onScanAnother, onManualIngredien
         </p>
       </div>
 
+      {/* Ingredients correction option */}
+      {!result.noIngredients && onManualIngredients && (
+        <button
+          onClick={() => setShowIngredientSnap(true)}
+          className="w-full text-center py-2"
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-muted)',
+            fontSize: '14px',
+            textDecoration: 'underline',
+            textUnderlineOffset: '3px',
+            cursor: 'pointer',
+          }}
+        >
+          Ingredients don&apos;t look right? Snap the label
+        </button>
+      )}
+
       {/* Action Buttons */}
       <div className="space-y-3 pt-2">
         <button
@@ -438,6 +479,26 @@ export default function ProductResult({ result, onScanAnother, onManualIngredien
           Scan Another Product
         </button>
       </div>
+
+      {/* Ingredient Snap OCR Modal */}
+      {showIngredientSnap && (
+        <IngredientSnap
+          onComplete={async (text) => {
+            setShowIngredientSnap(false);
+            if (onManualIngredients) {
+              setManualLoading(true);
+              try {
+                await onManualIngredients(text);
+              } catch {
+                setManualError('Failed to analyze. Please try again.');
+              } finally {
+                setManualLoading(false);
+              }
+            }
+          }}
+          onClose={() => setShowIngredientSnap(false)}
+        />
+      )}
     </div>
   );
 }
