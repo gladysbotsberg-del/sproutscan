@@ -327,14 +327,14 @@ export default function ProductResult({ result, onScanAnother, onManualIngredien
       {result.infoIngredients && result.infoIngredients.length > 0 && (
         <div
           style={{
-            background: 'white',
+            background: '#FFF8E7',
             borderRadius: '18px',
             overflow: 'hidden',
-            border: '1px solid rgba(232,131,107,0.07)',
+            border: '1px solid #F0E4C8',
             boxShadow: 'var(--shadow-card)',
           }}
         >
-          <div className="px-4 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid var(--bg-blush)' }}>
+          <div className="px-4 py-3 flex items-center gap-2" style={{ borderBottom: '1px solid #F0E4C8' }}>
             <div
               className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
               style={{ background: 'var(--safety-info-bg)', color: 'var(--safety-info-text)' }}
