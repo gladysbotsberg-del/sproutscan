@@ -185,6 +185,7 @@ export default function Home() {
   const goHome = () => {
     setResult(null);
     setError(null);
+    setLoading(false);
     setScanning(false);
     setManualSearch(false);
     setShowHistory(false);
@@ -223,9 +224,10 @@ export default function Home() {
               </button>
             )}
             <button
+              type="button"
               onClick={goHome}
               className="flex items-center gap-2"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', WebkitTapHighlightColor: 'transparent' }}
               aria-label="Go to home"
             >
               <SproutScanIcon size={32} />
