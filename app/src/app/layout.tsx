@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export const viewport: Viewport = {
   themeColor: "#E8836B",
@@ -36,7 +37,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
         <ServiceWorkerRegistration />
       </body>
     </html>

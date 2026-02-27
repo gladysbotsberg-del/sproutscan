@@ -188,6 +188,11 @@ export default function IngredientSnap({ onComplete, onClose }: IngredientSnapPr
               <div style={{ maxWidth: '340px', textAlign: 'center' }}>
                 <div style={{ padding: '16px', background: 'rgba(200,40,40,0.15)', borderRadius: '12px', border: '1px solid rgba(200,40,40,0.3)', marginBottom: '16px' }}>
                   <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '14px' }}>{cameraError}</p>
+                  {cameraError.includes('permission') || cameraError.includes('Permission') ? (
+                    <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', marginTop: '8px' }}>
+                      To enable camera access, open your device Settings &gt; Browser &gt; Camera and allow access for this site.
+                    </p>
+                  ) : null}
                 </div>
                 {ocrError && (
                   <div style={{ padding: '12px', background: 'rgba(255,165,0,0.15)', borderRadius: '12px', border: '1px solid rgba(255,165,0,0.3)', marginBottom: '16px' }}>

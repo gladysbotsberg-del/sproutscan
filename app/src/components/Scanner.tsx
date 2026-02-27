@@ -302,6 +302,11 @@ export default function Scanner({ onScan, onClose }: ScannerProps) {
             {error && (
               <div style={{ marginTop: '16px', padding: '16px', background: 'rgba(200,40,40,0.15)', borderRadius: '12px', maxWidth: '340px', border: '1px solid rgba(200,40,40,0.3)' }}>
                 <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '14px', textAlign: 'center' }}>{error}</p>
+                {hasPermission === false && (
+                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '12px', textAlign: 'center', marginTop: '8px' }}>
+                    To enable camera access, open your device Settings &gt; Browser &gt; Camera and allow access for this site.
+                  </p>
+                )}
               </div>
             )}
           </div>

@@ -170,6 +170,12 @@ h1, h2, h3, h4, h5, h6 {
   animation: shimmer 1.5s infinite;
 }
 
+.skeleton-shimmer {
+  background: linear-gradient(90deg, var(--bg-warm) 25%, var(--bg-blush) 50%, var(--bg-warm) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
 /* Onboarding step transition */
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(12px); }

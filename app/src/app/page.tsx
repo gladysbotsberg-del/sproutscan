@@ -98,7 +98,9 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [errorType, setErrorType] = useState<'offline' | 'timeout' | 'not-found' | 'server' | null>(null);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastBarcodeRef = useRef<string | null>(null);
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('sproutscan_profile');
@@ -154,17 +156,33 @@ export default function Home() {
   };
 
   const handleScan = async (barcode: string) => {
+    lastBarcodeRef.current = barcode;
     setLoading(true);
     setError(null);
+    setErrorType(null);
     setScanning(false);
     setManualSearch(false);
 
+    if (!navigator.onLine) {
+      setError('Check your connection and try again.');
+      setErrorType('offline');
+      setLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
     try {
-      const response = await fetch(`/api/scan?barcode=${barcode}&trimester=${stageToTrimester(profile?.stage || 2)}`);
+      const response = await fetch(`/api/scan?barcode=${barcode}&trimester=${stageToTrimester(profile?.stage || 2)}`, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
       const data = await response.json();
 
       if (data.error) {
         setError(data.message || data.error);
+        setErrorType('not-found');
       } else {
         setResult(data);
         const entry: ScanHistoryEntry = { result: data, scannedAt: new Date().toISOString() };
@@ -172,8 +190,18 @@ export default function Home() {
         setRecentScans(updated);
         localStorage.setItem('sproutscan_recent', JSON.stringify(updated));
       }
-    } catch {
-      setError('Failed to analyze product. Please try again.');
+    } catch (err: unknown) {
+      clearTimeout(timeout);
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError('The server took too long to respond. Try again.');
+        setErrorType('timeout');
+      } else if (!navigator.onLine) {
+        setError('Connection lost. Check your internet and try again.');
+        setErrorType('offline');
+      } else {
+        setError('Failed to analyze product. Please try again.');
+        setErrorType('server');
+      }
     } finally {
       setLoading(false);
     }
@@ -182,6 +210,17 @@ export default function Home() {
   const handleManualIngredients = async (ingredientsText: string) => {
     setLoading(true);
     setError(null);
+    setErrorType(null);
+
+    if (!navigator.onLine) {
+      setError('Check your connection and try again.');
+      setErrorType('offline');
+      setLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
     try {
       const response = await fetch('/api/scan', {
@@ -192,11 +231,14 @@ export default function Home() {
           trimester: stageToTrimester(profile?.stage || 2),
           product: result?.product,
         }),
+        signal: controller.signal,
       });
+      clearTimeout(timeout);
       const data = await response.json();
 
       if (data.error) {
         setError(data.error);
+        setErrorType('server');
         setResult(null);
       } else {
         setResult(data);
@@ -205,8 +247,18 @@ export default function Home() {
         setRecentScans(updated);
         localStorage.setItem('sproutscan_recent', JSON.stringify(updated));
       }
-    } catch {
-      setError('Failed to analyze ingredients. Please try again.');
+    } catch (err: unknown) {
+      clearTimeout(timeout);
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        setError('The server took too long to respond. Try again.');
+        setErrorType('timeout');
+      } else if (!navigator.onLine) {
+        setError('Connection lost. Check your internet and try again.');
+        setErrorType('offline');
+      } else {
+        setError('Failed to analyze ingredients. Please try again.');
+        setErrorType('server');
+      }
       setResult(null);
     } finally {
       setLoading(false);
@@ -216,11 +268,13 @@ export default function Home() {
   const resetScan = () => {
     setResult(null);
     setError(null);
+    setErrorType(null);
   };
 
   const goHome = () => {
     setResult(null);
     setError(null);
+    setErrorType(null);
     setLoading(false);
     setScanning(false);
     setManualSearch(false);
@@ -309,41 +363,136 @@ export default function Home() {
       <div className="max-w-md mx-auto px-4 py-6">
         {/* Error State */}
         {error && (
-          <div className="rounded-2xl p-5 mb-6" style={{ background: 'var(--safety-avoid-bg)', border: '1px solid var(--safety-avoid-border)' }}>
+          <div
+            className="rounded-2xl p-5 mb-6"
+            style={{
+              background: errorType === 'offline' ? 'var(--safety-info-bg)' : errorType === 'timeout' ? 'var(--safety-caution-bg)' : 'var(--safety-avoid-bg)',
+              border: `1px solid ${errorType === 'offline' ? 'var(--safety-info-border)' : errorType === 'timeout' ? 'var(--safety-caution-border)' : 'var(--safety-avoid-border)'}`,
+            }}
+          >
             <div className="flex items-start gap-3">
-              <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--safety-avoid-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--safety-avoid-text)" strokeWidth="2.5"><path d="M18 6L6 18M6 6l12 12" /></svg>
+              <div
+                style={{
+                  width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  background: errorType === 'offline' ? 'var(--safety-info-border)' : errorType === 'timeout' ? 'var(--safety-caution-border)' : 'var(--safety-avoid-border)',
+                }}
+              >
+                {errorType === 'offline' ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--safety-info-text)" strokeWidth="2">
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                    <path d="M16.72 11.06A10.94 10.94 0 0119 12.55" />
+                    <path d="M5 12.55a10.94 10.94 0 015.17-2.39" />
+                    <path d="M10.71 5.05A16 16 0 0122.56 9" />
+                    <path d="M1.42 9a15.91 15.91 0 014.7-2.88" />
+                    <path d="M8.53 16.11a6 6 0 016.95 0" />
+                    <line x1="12" y1="20" x2="12.01" y2="20" />
+                  </svg>
+                ) : errorType === 'timeout' ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--safety-caution-text)" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--safety-avoid-text)" strokeWidth="2.5">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                )}
               </div>
               <div>
-                <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>Product not found</p>
+                <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  {errorType === 'offline' ? 'No internet connection'
+                    : errorType === 'timeout' ? 'Request timed out'
+                    : errorType === 'not-found' ? 'Product not found'
+                    : 'Something went wrong'}
+                </p>
                 <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{error}</p>
               </div>
             </div>
-            <button
-              onClick={resetScan}
-              className="mt-4 w-full py-2.5 rounded-xl font-semibold transition-colors btn-press"
-              style={{ background: 'white', color: 'var(--safety-avoid-text)' }}
-            >
-              Try Another Product
-            </button>
+            <div className="flex gap-3 mt-4">
+              {lastBarcodeRef.current && errorType !== 'not-found' && (
+                <button
+                  onClick={() => handleScan(lastBarcodeRef.current!)}
+                  className="flex-1 py-2.5 rounded-xl font-semibold btn-press text-white"
+                  style={{ background: errorType === 'offline' ? 'var(--safety-info-text)' : errorType === 'timeout' ? 'var(--safety-caution-text)' : 'var(--brand-coral)' }}
+                >
+                  Retry
+                </button>
+              )}
+              <button
+                onClick={resetScan}
+                className="flex-1 py-2.5 rounded-xl font-semibold btn-press"
+                style={{
+                  background: 'white',
+                  color: errorType === 'offline' ? 'var(--safety-info-text)' : errorType === 'timeout' ? 'var(--safety-caution-text)' : 'var(--safety-avoid-text)',
+                }}
+              >
+                {errorType === 'not-found' ? 'Try Another Product' : 'Go Back'}
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Loading State */}
+        {/* Loading State — Skeleton */}
         {loading && (
-          <div className="text-center py-16">
-            <div className="relative w-20 h-20 mx-auto mb-6">
-              <div className="absolute inset-0 rounded-full border-4" style={{ borderColor: 'var(--bg-blush)' }}></div>
-              <div
-                className="absolute inset-0 rounded-full border-4 border-t-transparent animate-spin"
-                style={{ borderColor: 'var(--brand-coral)', borderTopColor: 'transparent' }}
-              ></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <SproutScanIcon size={32} />
+          <div className="space-y-5">
+            {/* Product card skeleton */}
+            <div
+              style={{
+                background: 'white', borderRadius: '18px', padding: '16px',
+                border: '1px solid rgba(232,131,107,0.07)', boxShadow: 'var(--shadow-card)',
+              }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-xl skeleton-shimmer" />
+                <div className="flex-1 space-y-2.5">
+                  <div className="h-5 w-3/4 rounded-lg skeleton-shimmer" />
+                  <div className="h-4 w-1/2 rounded-lg skeleton-shimmer" />
+                </div>
               </div>
             </div>
-            <p className="font-semibold text-lg" style={{ color: 'var(--text-primary)' }}>Analyzing ingredients...</p>
-            <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Checking safety databases</p>
+
+            {/* Safety rating skeleton */}
+            <div
+              style={{
+                borderRadius: '18px', padding: '24px', textAlign: 'center',
+                background: 'white', border: '1px solid rgba(232,131,107,0.07)',
+              }}
+            >
+              <div className="w-16 h-16 rounded-full mx-auto mb-3 skeleton-shimmer" />
+              <div className="h-6 w-40 mx-auto rounded-lg skeleton-shimmer mb-2" />
+              <div className="h-4 w-56 mx-auto rounded-lg skeleton-shimmer" />
+            </div>
+
+            {/* Ingredient cards skeleton */}
+            <div
+              style={{
+                background: 'white', borderRadius: '18px', overflow: 'hidden',
+                border: '1px solid rgba(232,131,107,0.07)', boxShadow: 'var(--shadow-card)',
+              }}
+            >
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="p-4 flex items-center gap-3"
+                  style={{ borderBottom: i < 3 ? '1px solid var(--bg-blush)' : 'none' }}
+                >
+                  <div className="w-8 h-8 rounded-full flex-shrink-0 skeleton-shimmer" />
+                  <div className="flex-1 h-4 rounded-lg skeleton-shimmer" />
+                  <div className="w-16 h-6 rounded-full flex-shrink-0 skeleton-shimmer" />
+                </div>
+              ))}
+            </div>
+
+            {/* Status text */}
+            <div className="text-center pt-2">
+              <div className="flex items-center justify-center gap-2">
+                <div
+                  className="animate-spin"
+                  style={{ width: 16, height: 16, border: '2px solid var(--bg-blush)', borderTopColor: 'var(--brand-coral)', borderRadius: '50%' }}
+                />
+                <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>Looking up product...</p>
+              </div>
+            </div>
           </div>
         )}
 
