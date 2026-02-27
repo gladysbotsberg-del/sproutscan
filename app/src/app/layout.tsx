@@ -1,11 +1,25 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+
+export const viewport: Viewport = {
+  themeColor: "#E8836B",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "SproutScan — Pregnancy Food Safety",
   description: "Scan any food product barcode. Get instant, trimester-specific pregnancy safety guidance backed by medical research.",
   icons: {
     icon: "/favicon.svg",
+    apple: "/icons/apple-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "SproutScan",
   },
   openGraph: {
     title: "SproutScan — Pregnancy Food Safety",
@@ -23,6 +37,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         {children}
+        <ServiceWorkerRegistration />
       </body>
     </html>
   );
