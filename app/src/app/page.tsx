@@ -206,8 +206,8 @@ export default function Home() {
     <main className="min-h-screen">
       {/* Header */}
       <header
-        className="bg-white/80 backdrop-blur-md sticky top-0 z-10"
-        style={{ borderBottom: '1px solid rgba(232,131,107,0.07)' }}
+        className="bg-white/80 backdrop-blur-md fixed top-0 left-0 right-0"
+        style={{ borderBottom: '1px solid rgba(232,131,107,0.07)', zIndex: 60 }}
       >
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -260,6 +260,9 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Spacer for fixed header */}
+      <div style={{ height: 56 }} />
 
       <div className="max-w-md mx-auto px-4 py-6">
         {/* Error State */}
