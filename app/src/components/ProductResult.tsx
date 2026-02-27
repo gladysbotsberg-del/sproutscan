@@ -9,10 +9,11 @@ import IngredientSnap from './IngredientSnap';
 interface ProductResultProps {
   result: SafetyResult;
   onScanAnother: () => void;
+  onGoHome?: () => void;
   onManualIngredients?: (ingredientsText: string) => void;
 }
 
-export default function ProductResult({ result, onScanAnother, onManualIngredients }: ProductResultProps) {
+export default function ProductResult({ result, onScanAnother, onGoHome, onManualIngredients }: ProductResultProps) {
   const [expandedIngredient, setExpandedIngredient] = useState<string | null>(null);
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [manualText, setManualText] = useState('');
@@ -68,6 +69,21 @@ export default function ProductResult({ result, onScanAnother, onManualIngredien
 
   return (
     <div className="space-y-5">
+      {/* Back to Home */}
+      {onGoHome && (
+        <button
+          type="button"
+          onClick={onGoHome}
+          className="flex items-center gap-1.5 text-sm font-semibold"
+          style={{ color: 'var(--brand-coral)', background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 4px' }}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Home
+        </button>
+      )}
+
       {/* Product Card */}
       <div
         style={{

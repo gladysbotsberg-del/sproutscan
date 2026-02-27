@@ -310,7 +310,7 @@ export default function Home() {
 
         {/* Result View */}
         {result && !loading && (
-          <ProductResult result={result} onScanAnother={resetScan} onManualIngredients={handleManualIngredients} />
+          <ProductResult result={result} onScanAnother={resetScan} onGoHome={goHome} onManualIngredients={handleManualIngredients} />
         )}
 
         {/* Scanner View */}
