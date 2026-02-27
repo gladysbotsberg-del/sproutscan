@@ -2,6 +2,7 @@
 
 import { SafetyResult, FlaggedIngredient, InfoIngredient } from '@/app/page';
 import { useState } from 'react';
+import Link from 'next/link';
 import SafetyBadge from './SafetyBadge';
 import IngredientSnap from './IngredientSnap';
 
@@ -445,6 +446,17 @@ export default function ProductResult({ result, onScanAnother, onManualIngredien
           <strong>Note:</strong> This is educational information, not medical advice.
           Always consult your healthcare provider about your specific dietary needs during pregnancy.
         </p>
+      </div>
+
+      {/* Legal Links */}
+      <div className="text-center" style={{ fontSize: '12px', color: 'var(--text-hint)' }}>
+        <Link href="/legal/terms" style={{ textDecoration: 'underline', textUnderlineOffset: '3px', color: 'var(--text-hint)' }}>
+          Terms of Service
+        </Link>
+        {' · '}
+        <Link href="/legal/privacy" style={{ textDecoration: 'underline', textUnderlineOffset: '3px', color: 'var(--text-hint)' }}>
+          Privacy Policy
+        </Link>
       </div>
 
       {/* Ingredients correction option */}

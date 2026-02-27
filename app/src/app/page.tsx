@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import Scanner from '@/components/Scanner';
 import ProductResult from '@/components/ProductResult';
 import Onboarding from '@/components/Onboarding';
@@ -481,6 +482,15 @@ export default function Home() {
             <div className="text-center pt-2 pb-8">
               <p style={{ fontSize: '12px', color: 'var(--text-hint)' }}>
                 Based on guidelines from ACOG, FDA, and WHO
+              </p>
+              <p style={{ fontSize: '12px', color: 'var(--text-hint)', marginTop: '6px' }}>
+                <Link href="/legal/terms" style={{ textDecoration: 'underline', textUnderlineOffset: '3px', color: 'var(--text-hint)' }}>
+                  Terms of Service
+                </Link>
+                {' · '}
+                <Link href="/legal/privacy" style={{ textDecoration: 'underline', textUnderlineOffset: '3px', color: 'var(--text-hint)' }}>
+                  Privacy Policy
+                </Link>
               </p>
             </div>
           </div>
