@@ -408,7 +408,7 @@ async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous';
-  const { success, remaining } = rateLimit(ip, SCAN_LIMIT, SCAN_WINDOW);
+  const { success, remaining } = await rateLimit(ip, SCAN_LIMIT, SCAN_WINDOW);
   if (!success) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again shortly.' },
@@ -664,7 +664,7 @@ function findSafeMatch(ingredientText: string, db: SafeIngredient[]): SafeIngred
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous';
-  const { success, remaining } = rateLimit(ip, SCAN_LIMIT, SCAN_WINDOW);
+  const { success, remaining } = await rateLimit(ip, SCAN_LIMIT, SCAN_WINDOW);
   if (!success) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again shortly.' },

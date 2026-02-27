@@ -14,7 +14,7 @@ interface SearchResult {
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous';
-  const { success, remaining } = rateLimit(ip, SEARCH_LIMIT, SEARCH_WINDOW);
+  const { success, remaining } = await rateLimit(ip, SEARCH_LIMIT, SEARCH_WINDOW);
   if (!success) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again shortly.' },
