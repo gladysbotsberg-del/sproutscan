@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
     },
-    sitemap: 'https://app-seven-sigma-70.vercel.app/sitemap.xml',
+    sitemap: 'https://sproutscan.us/sitemap.xml',
   };
 }

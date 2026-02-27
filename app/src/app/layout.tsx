@@ -13,7 +13,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://app-seven-sigma-70.vercel.app"),
+  metadataBase: new URL("https://sproutscan.us"),
   title: "SproutScan — Pregnancy Food Safety",
   description: "Scan any food product barcode. Get instant, trimester-specific pregnancy safety guidance backed by medical research.",
   icons: {

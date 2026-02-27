@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://app-seven-sigma-70.vercel.app';
+  const baseUrl = 'https://sproutscan.us';
   const now = new Date();
 
   return [
