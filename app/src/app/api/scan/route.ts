@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import ingredientsDB from '@/data/ingredients-comprehensive.json';
+import { rateLimit, getRetryAfter } from '@/lib/rate-limit';
+
+const SCAN_LIMIT = 20;
+const SCAN_WINDOW = 60_000; // 1 minute
 
 interface SafeIngredient {
   name: string;
@@ -403,6 +407,15 @@ async function searchUPCitemdb(barcode: string): Promise<ProductData | null> {
 }
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous';
+  const { success, remaining } = rateLimit(ip, SCAN_LIMIT, SCAN_WINDOW);
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again shortly.' },
+      { status: 429, headers: { 'Retry-After': String(getRetryAfter(ip)) } }
+    );
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const barcode = searchParams.get('barcode');
   const trimester = parseInt(searchParams.get('trimester') || '2');
@@ -650,6 +663,15 @@ function findSafeMatch(ingredientText: string, db: SafeIngredient[]): SafeIngred
 }
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous';
+  const { success, remaining } = rateLimit(ip, SCAN_LIMIT, SCAN_WINDOW);
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again shortly.' },
+      { status: 429, headers: { 'Retry-After': String(getRetryAfter(ip)) } }
+    );
+  }
+
   try {
     const body = await request.json();
     const { ingredients, trimester = 2, product } = body;

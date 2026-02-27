@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { rateLimit, getRetryAfter } from '@/lib/rate-limit';
+
+const SEARCH_LIMIT = 40;
+const SEARCH_WINDOW = 60_000; // 1 minute
 
 interface SearchResult {
   name: string;
@@ -9,6 +13,15 @@ interface SearchResult {
 }
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous';
+  const { success, remaining } = rateLimit(ip, SEARCH_LIMIT, SEARCH_WINDOW);
+  if (!success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again shortly.' },
+      { status: 429, headers: { 'Retry-After': String(getRetryAfter(ip)) } }
+    );
+  }
+
   const q = request.nextUrl.searchParams.get('q')?.trim() || '';
 
   if (q.length < 2) {
