@@ -206,14 +206,16 @@ export default function Home() {
     <main className="min-h-screen">
       {/* Header */}
       <header
-        className="bg-white/80 backdrop-blur-md fixed top-0 left-0 right-0"
-        style={{ borderBottom: '1px solid rgba(232,131,107,0.07)', zIndex: 60 }}
+        className="bg-white backdrop-blur-md fixed top-0 left-0 right-0"
+        style={{ borderBottom: '1px solid rgba(232,131,107,0.07)', zIndex: 60, transform: 'translateZ(0)', WebkitTransform: 'translateZ(0)' }}
       >
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             {!isHome && (
               <button
+                type="button"
                 onClick={goHome}
+                onTouchEnd={(e) => { e.preventDefault(); goHome(); }}
                 className="p-1.5 -ml-1.5 rounded-full transition-colors"
                 style={{ color: 'var(--text-muted)' }}
                 aria-label="Back to home"
@@ -223,20 +225,19 @@ export default function Home() {
                 </svg>
               </button>
             )}
-            <div
-              role="button"
-              tabIndex={0}
+            <button
+              type="button"
               onClick={goHome}
-              onKeyDown={(e) => { if (e.key === 'Enter') goHome(); }}
-              className="flex items-center gap-2"
-              style={{ cursor: 'pointer', padding: '4px 0', position: 'relative', zIndex: 1, pointerEvents: 'auto' }}
+              onTouchEnd={(e) => { e.preventDefault(); goHome(); }}
+              className="flex items-center gap-2 active:opacity-70"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 4px', margin: '-6px -4px', WebkitTapHighlightColor: 'rgba(0,0,0,0.05)' }}
               aria-label="Go to home"
             >
-              <span style={{ pointerEvents: 'none' }}><SproutScanIcon size={32} /></span>
-              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)', pointerEvents: 'none' }}>
+              <SproutScanIcon size={32} />
+              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)' }}>
                 Sprout<span style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scan</span>
               </span>
-            </div>
+            </button>
           </div>
           <div className="flex items-center gap-2">
             {recentScans.length > 0 && isHome && (
