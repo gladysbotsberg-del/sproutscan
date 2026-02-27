@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Scanner from '@/components/Scanner';
 import ProductResult from '@/components/ProductResult';
@@ -76,6 +76,14 @@ export interface ScanHistoryEntry {
   scannedAt: string; // ISO timestamp
 }
 
+interface SearchResult {
+  name: string;
+  brand: string;
+  barcode: string;
+  image: string | null;
+  source: string;
+}
+
 export default function Home() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [scanning, setScanning] = useState(false);
@@ -86,6 +94,11 @@ export default function Home() {
   const [manualSearch, setManualSearch] = useState(false);
   const [searchBarcode, setSearchBarcode] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [searchMode, setSearchMode] = useState<'name' | 'barcode'>('name');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('sproutscan_profile');
@@ -111,6 +124,29 @@ export default function Home() {
       localStorage.setItem('sproutscan_recent', JSON.stringify(migrated.slice(0, 50)));
     }
   }, []);
+
+  // Debounced name search
+  useEffect(() => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    if (searchQuery.trim().length < 2) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      return;
+    }
+    setSearchLoading(true);
+    searchTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        const data = await res.json();
+        setSearchResults(data.results || []);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 400);
+    return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
+  }, [searchQuery]);
 
   const handleProfileComplete = (newProfile: UserProfile) => {
     setProfile(newProfile);
@@ -189,6 +225,9 @@ export default function Home() {
     setScanning(false);
     setManualSearch(false);
     setShowHistory(false);
+    setSearchQuery('');
+    setSearchResults([]);
+    setSearchMode('name');
   };
 
   const isHome = !scanning && !loading && !result && !error && !manualSearch && !showHistory;
@@ -318,55 +357,148 @@ export default function Home() {
           <Scanner onScan={handleScan} onClose={() => setScanning(false)} />
         )}
 
-        {/* Manual Search Modal */}
+        {/* Find a Product Modal */}
         {manualSearch && !loading && !result && !scanning && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-6">
-            <div style={{ background: 'white', borderRadius: '20px', padding: '24px', width: '100%', maxWidth: '380px', boxShadow: 'var(--shadow-card)' }}>
+            <div style={{ background: 'white', borderRadius: '20px', padding: '24px', width: '100%', maxWidth: '380px', boxShadow: 'var(--shadow-card)', maxHeight: '80vh', display: 'flex', flexDirection: 'column' }}>
               <div className="flex items-center justify-between mb-4">
-                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '18px', color: 'var(--text-primary)' }}>Search by Barcode</h3>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '18px', color: 'var(--text-primary)' }}>Find a Product</h3>
                 <button onClick={() => setManualSearch(false)} style={{ color: 'var(--text-muted)', fontSize: '24px', lineHeight: 1 }}>&times;</button>
               </div>
-              <form onSubmit={(e) => { e.preventDefault(); if (searchBarcode.trim()) handleScan(searchBarcode.trim()); }}>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={searchBarcode}
-                  onChange={(e) => setSearchBarcode(e.target.value)}
-                  placeholder="e.g., 049000006346"
-                  autoFocus
-                  style={{
-                    width: '100%',
-                    padding: '14px 16px',
-                    borderRadius: '12px',
-                    border: '1.5px solid var(--bg-blush)',
-                    fontSize: '16px',
-                    outline: 'none',
-                    marginBottom: '12px',
-                    fontFamily: 'Inter, system-ui',
-                  }}
-                />
+
+              {/* Tab switcher */}
+              <div style={{ display: 'flex', background: 'var(--bg-warm)', borderRadius: '10px', padding: '3px', marginBottom: '16px' }}>
                 <button
-                  type="submit"
-                  disabled={!searchBarcode.trim()}
-                  className="btn-press"
+                  onClick={() => setSearchMode('name')}
                   style={{
-                    width: '100%',
-                    padding: '14px',
-                    borderRadius: '14px',
-                    background: searchBarcode.trim() ? 'linear-gradient(135deg, #E8836B, #D4567A)' : '#E0E0E0',
-                    color: 'white',
-                    fontWeight: 700,
-                    fontSize: '16px',
-                    border: 'none',
-                    cursor: searchBarcode.trim() ? 'pointer' : 'not-allowed',
+                    flex: 1, padding: '8px 0', borderRadius: '8px', fontSize: '14px', fontWeight: 600, border: 'none', cursor: 'pointer',
+                    background: searchMode === 'name' ? 'white' : 'transparent',
+                    color: searchMode === 'name' ? 'var(--text-primary)' : 'var(--text-muted)',
+                    boxShadow: searchMode === 'name' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
                   }}
                 >
-                  Check Product
+                  Product Name
                 </button>
-                <p style={{ fontSize: '12px', color: 'var(--text-hint)', textAlign: 'center', marginTop: '12px' }}>
-                  The barcode is usually on the back or bottom of the package
-                </p>
-              </form>
+                <button
+                  onClick={() => setSearchMode('barcode')}
+                  style={{
+                    flex: 1, padding: '8px 0', borderRadius: '8px', fontSize: '14px', fontWeight: 600, border: 'none', cursor: 'pointer',
+                    background: searchMode === 'barcode' ? 'white' : 'transparent',
+                    color: searchMode === 'barcode' ? 'var(--text-primary)' : 'var(--text-muted)',
+                    boxShadow: searchMode === 'barcode' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  }}
+                >
+                  Barcode
+                </button>
+              </div>
+
+              {/* Name search tab */}
+              {searchMode === 'name' && (
+                <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0, flex: 1 }}>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="e.g., Cheerios, Goldfish..."
+                    autoFocus
+                    style={{
+                      width: '100%', padding: '14px 16px', borderRadius: '12px',
+                      border: '1.5px solid var(--bg-blush)', fontSize: '16px', outline: 'none',
+                      marginBottom: '12px', fontFamily: 'Inter, system-ui',
+                    }}
+                  />
+                  <div style={{ overflowY: 'auto', flex: 1, minHeight: 0, maxHeight: '40vh' }}>
+                    {searchLoading && (
+                      <div style={{ textAlign: 'center', padding: '24px 0' }}>
+                        <div
+                          className="animate-spin"
+                          style={{ width: 24, height: 24, border: '3px solid var(--bg-blush)', borderTopColor: 'var(--brand-coral)', borderRadius: '50%', margin: '0 auto 8px' }}
+                        />
+                        <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Searching...</p>
+                      </div>
+                    )}
+                    {!searchLoading && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
+                      <div style={{ textAlign: 'center', padding: '24px 0' }}>
+                        <p style={{ fontSize: '14px', color: 'var(--text-muted)' }}>No products found</p>
+                        <p style={{ fontSize: '12px', color: 'var(--text-hint)', marginTop: '4px' }}>Try a different name or switch to Barcode</p>
+                      </div>
+                    )}
+                    {!searchLoading && searchResults.length > 0 && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {searchResults.map((item, i) => (
+                          <button
+                            key={item.barcode + i}
+                            onClick={() => handleScan(item.barcode)}
+                            className="card-hover"
+                            style={{
+                              display: 'flex', alignItems: 'center', gap: '12px', padding: '10px',
+                              borderRadius: '12px', border: '1px solid rgba(232,131,107,0.07)',
+                              background: 'white', cursor: 'pointer', textAlign: 'left', width: '100%',
+                            }}
+                          >
+                            {item.image ? (
+                              <img src={item.image} alt="" style={{ width: 40, height: 40, borderRadius: '8px', objectFit: 'cover', flexShrink: 0 }} />
+                            ) : (
+                              <div style={{ width: 40, height: 40, borderRadius: '8px', background: 'var(--bg-warm)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text-hint)" strokeWidth="1.5">
+                                  <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                                </svg>
+                              </div>
+                            )}
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontWeight: 600, fontSize: '14px', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</p>
+                              {item.brand && <p style={{ fontSize: '12px', color: 'var(--text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.brand}</p>}
+                            </div>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-hint)" strokeWidth="2" style={{ flexShrink: 0 }}>
+                              <path d="M9 18l6-6-6-6" />
+                            </svg>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    {!searchLoading && searchQuery.trim().length < 2 && (
+                      <div style={{ textAlign: 'center', padding: '24px 0' }}>
+                        <p style={{ fontSize: '13px', color: 'var(--text-hint)' }}>Type a product name to search</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Barcode tab */}
+              {searchMode === 'barcode' && (
+                <form onSubmit={(e) => { e.preventDefault(); if (searchBarcode.trim()) handleScan(searchBarcode.trim()); }}>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={searchBarcode}
+                    onChange={(e) => setSearchBarcode(e.target.value)}
+                    placeholder="e.g., 049000006346"
+                    autoFocus
+                    style={{
+                      width: '100%', padding: '14px 16px', borderRadius: '12px',
+                      border: '1.5px solid var(--bg-blush)', fontSize: '16px', outline: 'none',
+                      marginBottom: '12px', fontFamily: 'Inter, system-ui',
+                    }}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!searchBarcode.trim()}
+                    className="btn-press"
+                    style={{
+                      width: '100%', padding: '14px', borderRadius: '14px',
+                      background: searchBarcode.trim() ? 'linear-gradient(135deg, #E8836B, #D4567A)' : '#E0E0E0',
+                      color: 'white', fontWeight: 700, fontSize: '16px', border: 'none',
+                      cursor: searchBarcode.trim() ? 'pointer' : 'not-allowed',
+                    }}
+                  >
+                    Check Product
+                  </button>
+                  <p style={{ fontSize: '12px', color: 'var(--text-hint)', textAlign: 'center', marginTop: '12px' }}>
+                    The barcode is usually on the back or bottom of the package
+                  </p>
+                </form>
+              )}
             </div>
           </div>
         )}
@@ -547,7 +679,7 @@ export default function Home() {
                 </span>
               </button>
               <button
-                onClick={() => { setManualSearch(true); setSearchBarcode(''); }}
+                onClick={() => { setManualSearch(true); setSearchBarcode(''); setSearchQuery(''); setSearchResults([]); setSearchMode('name'); }}
                 className="w-full py-4 font-bold text-base btn-press"
                 style={{ background: 'transparent', border: '2px solid var(--brand-coral)', borderRadius: '14px', color: 'var(--brand-coral)' }}
               >
@@ -556,7 +688,7 @@ export default function Home() {
                     <circle cx="11" cy="11" r="8" />
                     <line x1="21" y1="21" x2="16.65" y2="16.65" />
                   </svg>
-                  Search by Name
+                  Find a Product
                 </span>
               </button>
             </div>

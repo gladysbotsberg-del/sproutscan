@@ -247,45 +247,62 @@ async function searchUSDA(barcode: string): Promise<ProductData | null> {
   }
 }
 
-// Open Food Facts API
-async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null> {
-  try {
-    console.log(`[SproutScan] OpenFoodFacts: Searching for ${barcode}`);
-    
-    const response = await fetch(
-      `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`,
-      { next: { revalidate: 3600 } }
-    );
-    
-    if (!response.ok) {
-      console.log(`[SproutScan] OpenFoodFacts: API returned ${response.status}`);
-      return null;
-    }
-    
-    const data = await response.json();
-    
-    if (data.status === 1 && data.product) {
-      const product = data.product;
-      const ingredientsText = product.ingredients_text || product.ingredients_text_en || '';
-      
-      console.log(`[SproutScan] OpenFoodFacts: Found ${product.product_name}, ingredients: ${ingredientsText.length > 0 ? 'yes' : 'no'}`);
-      
-      return {
-        name: product.product_name || product.product_name_en || 'Unknown Product',
-        brand: product.brands || '',
-        image: product.image_front_small_url || product.image_url || null,
-        ingredients: parseIngredients(ingredientsText),
-        barcode: barcode,
-        source: 'Open Food Facts'
-      };
-    }
-    
-    console.log(`[SproutScan] OpenFoodFacts: Product not found`);
-    return null;
-  } catch (err) {
-    console.error('[SproutScan] Open Food Facts API error:', err);
-    return null;
+// Build barcode variants to try (UPC-A ↔ EAN-13)
+function barcodeVariants(barcode: string): string[] {
+  const variants = [barcode];
+  if (/^\d{12}$/.test(barcode)) {
+    // UPC-A → EAN-13: add leading zero
+    variants.push('0' + barcode);
+  } else if (/^0\d{12}$/.test(barcode)) {
+    // EAN-13 starting with 0 → UPC-A: strip leading zero
+    variants.push(barcode.slice(1));
   }
+  return variants;
+}
+
+// Open Food Facts API (tries barcode variants for UPC-A ↔ EAN-13)
+async function searchOpenFoodFacts(barcode: string): Promise<ProductData | null> {
+  const variants = barcodeVariants(barcode);
+
+  for (const variant of variants) {
+    try {
+      console.log(`[SproutScan] OpenFoodFacts: Searching for ${variant}${variant !== barcode ? ` (variant of ${barcode})` : ''}`);
+
+      const response = await fetch(
+        `https://world.openfoodfacts.org/api/v2/product/${variant}.json`,
+        { next: { revalidate: 3600 } }
+      );
+
+      if (!response.ok) {
+        console.log(`[SproutScan] OpenFoodFacts: API returned ${response.status} for ${variant}`);
+        continue;
+      }
+
+      const data = await response.json();
+
+      if (data.status === 1 && data.product) {
+        const product = data.product;
+        const ingredientsText = product.ingredients_text || product.ingredients_text_en || '';
+
+        console.log(`[SproutScan] OpenFoodFacts: Found ${product.product_name}, ingredients: ${ingredientsText.length > 0 ? 'yes' : 'no'}`);
+
+        return {
+          name: product.product_name || product.product_name_en || 'Unknown Product',
+          brand: product.brands || '',
+          image: product.image_front_small_url || product.image_url || null,
+          ingredients: parseIngredients(ingredientsText),
+          barcode: barcode, // always return the original barcode
+          source: 'Open Food Facts'
+        };
+      }
+
+      console.log(`[SproutScan] OpenFoodFacts: Product not found for ${variant}`);
+    } catch (err) {
+      console.error(`[SproutScan] Open Food Facts API error for ${variant}:`, err);
+    }
+  }
+
+  return null;
 }
 
 // Non-food category prefixes from Google Product Taxonomy (used by UPCitemdb)
