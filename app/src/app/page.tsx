@@ -71,15 +71,21 @@ export interface InfoIngredient {
   note: string;
 }
 
+export interface ScanHistoryEntry {
+  result: SafetyResult;
+  scannedAt: string; // ISO timestamp
+}
+
 export default function Home() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [scanning, setScanning] = useState(false);
   const [result, setResult] = useState<SafetyResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [recentScans, setRecentScans] = useState<SafetyResult[]>([]);
+  const [recentScans, setRecentScans] = useState<ScanHistoryEntry[]>([]);
   const [manualSearch, setManualSearch] = useState(false);
   const [searchBarcode, setSearchBarcode] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     const savedProfile = localStorage.getItem('sproutscan_profile');
@@ -95,7 +101,14 @@ export default function Home() {
     }
     const savedScans = localStorage.getItem('sproutscan_recent');
     if (savedScans) {
-      setRecentScans(JSON.parse(savedScans).slice(0, 5));
+      const parsed: unknown[] = JSON.parse(savedScans);
+      const migrated: ScanHistoryEntry[] = parsed.map((item: unknown) => {
+        const entry = item as Record<string, unknown>;
+        if (entry.scannedAt && entry.result) return entry as unknown as ScanHistoryEntry;
+        return { result: entry as unknown as SafetyResult, scannedAt: new Date().toISOString() };
+      });
+      setRecentScans(migrated.slice(0, 50));
+      localStorage.setItem('sproutscan_recent', JSON.stringify(migrated.slice(0, 50)));
     }
   }, []);
 
@@ -118,7 +131,8 @@ export default function Home() {
         setError(data.message || data.error);
       } else {
         setResult(data);
-        const updated = [data, ...recentScans.filter(s => s.product.barcode !== data.product.barcode)].slice(0, 5);
+        const entry: ScanHistoryEntry = { result: data, scannedAt: new Date().toISOString() };
+        const updated = [entry, ...recentScans.filter(s => s.result.product.barcode !== data.product.barcode)].slice(0, 50);
         setRecentScans(updated);
         localStorage.setItem('sproutscan_recent', JSON.stringify(updated));
       }
@@ -150,7 +164,8 @@ export default function Home() {
         setResult(null);
       } else {
         setResult(data);
-        const updated = [data, ...recentScans.filter(s => s.product.barcode !== data.product.barcode)].slice(0, 5);
+        const entry: ScanHistoryEntry = { result: data, scannedAt: new Date().toISOString() };
+        const updated = [entry, ...recentScans.filter(s => s.result.product.barcode !== data.product.barcode)].slice(0, 50);
         setRecentScans(updated);
         localStorage.setItem('sproutscan_recent', JSON.stringify(updated));
       }
@@ -190,13 +205,28 @@ export default function Home() {
               Sprout<span style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scan</span>
             </span>
           </div>
-          <button
-            onClick={changeStage}
-            className="text-sm px-3 py-1.5 rounded-full font-medium transition-colors"
-            style={{ background: 'var(--brand-coral-pale)', color: 'var(--brand-coral)' }}
-          >
-            {stageLabel(profile.stage)}
-          </button>
+          <div className="flex items-center gap-2">
+            {recentScans.length > 0 && !scanning && !loading && !result && !error && (
+              <button
+                onClick={() => setShowHistory(true)}
+                className="p-2 rounded-full transition-colors"
+                style={{ color: 'var(--text-muted)' }}
+                aria-label="Scan history"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+              </button>
+            )}
+            <button
+              onClick={changeStage}
+              className="text-sm px-3 py-1.5 rounded-full font-medium transition-colors"
+              style={{ background: 'var(--brand-coral-pale)', color: 'var(--brand-coral)' }}
+            >
+              {stageLabel(profile.stage)}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -304,8 +334,95 @@ export default function Home() {
           </div>
         )}
 
+        {/* History View */}
+        {showHistory && !loading && !result && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '22px', color: 'var(--text-primary)' }}>
+                  Scan History
+                </h2>
+                <span
+                  className="text-xs font-semibold px-2 py-0.5 rounded-full"
+                  style={{ background: 'var(--brand-coral-pale)', color: 'var(--brand-coral)' }}
+                >
+                  {recentScans.length}
+                </span>
+              </div>
+              <button
+                onClick={() => setShowHistory(false)}
+                className="p-2 rounded-full transition-colors"
+                style={{ color: 'var(--text-muted)' }}
+                aria-label="Close history"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {recentScans.length === 0 ? (
+              <div className="text-center py-12">
+                <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--bg-warm)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-hint)" strokeWidth="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 6v6l4 2" />
+                  </svg>
+                </div>
+                <p style={{ color: 'var(--text-muted)', fontSize: '15px' }}>No scans yet</p>
+                <p style={{ color: 'var(--text-hint)', fontSize: '13px', marginTop: '4px' }}>Scan a product to see it here</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {recentScans.map((entry, i) => (
+                  <button
+                    key={entry.result.product.barcode + i}
+                    onClick={() => { setResult(entry.result); setShowHistory(false); }}
+                    className="w-full rounded-2xl p-3 flex items-center gap-3 card-hover text-left"
+                    style={{ background: 'white', border: '1px solid rgba(232,131,107,0.07)', boxShadow: 'var(--shadow-card)' }}
+                  >
+                    {entry.result.product.image ? (
+                      <img src={entry.result.product.image} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                    ) : (
+                      <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'var(--bg-warm)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-hint)" strokeWidth="1.5">
+                          <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{entry.result.product.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm truncate" style={{ color: 'var(--text-muted)' }}>{entry.result.product.brand}</p>
+                        <span style={{ fontSize: '11px', color: 'var(--text-hint)', whiteSpace: 'nowrap' }}>{timeAgo(entry.scannedAt)}</span>
+                      </div>
+                    </div>
+                    <SafetyBadge rating={entry.result.overallSafety} size="sm" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {recentScans.length > 0 && (
+              <div className="text-center pt-2 pb-4">
+                <button
+                  onClick={() => {
+                    setRecentScans([]);
+                    localStorage.removeItem('sproutscan_recent');
+                    setShowHistory(false);
+                  }}
+                  className="text-sm font-medium transition-colors"
+                  style={{ color: 'var(--text-hint)' }}
+                >
+                  Clear History
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Home View */}
-        {!scanning && !loading && !result && !error && !manualSearch && (
+        {!scanning && !loading && !result && !error && !manualSearch && !showHistory && (
           <div className="space-y-7">
             {/* Wordmark */}
             <div className="text-center pt-6 pb-2">
@@ -447,19 +564,30 @@ export default function Home() {
             {/* Recent Scans */}
             {recentScans.length > 0 && (
               <div>
-                <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '16px', color: 'var(--text-primary)', marginBottom: '10px', paddingLeft: '2px' }}>
-                  Recent Scans
-                </h3>
-                <div className="space-y-2">
-                  {recentScans.map((scan, i) => (
+                <div className="flex items-center justify-between" style={{ marginBottom: '10px', paddingLeft: '2px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '16px', color: 'var(--text-primary)' }}>
+                    Recent Scans
+                  </h3>
+                  {recentScans.length > 5 && (
                     <button
-                      key={scan.product.barcode + i}
-                      onClick={() => setResult(scan)}
+                      onClick={() => setShowHistory(true)}
+                      className="text-sm font-semibold transition-colors"
+                      style={{ color: 'var(--brand-coral)' }}
+                    >
+                      See All
+                    </button>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  {recentScans.slice(0, 5).map((entry, i) => (
+                    <button
+                      key={entry.result.product.barcode + i}
+                      onClick={() => setResult(entry.result)}
                       className="w-full rounded-2xl p-3 flex items-center gap-3 card-hover text-left"
                       style={{ background: 'white', border: '1px solid rgba(232,131,107,0.07)', boxShadow: 'var(--shadow-card)' }}
                     >
-                      {scan.product.image ? (
-                        <img src={scan.product.image} alt="" className="w-12 h-12 rounded-lg object-cover" />
+                      {entry.result.product.image ? (
+                        <img src={entry.result.product.image} alt="" className="w-12 h-12 rounded-lg object-cover" />
                       ) : (
                         <div style={{ width: 48, height: 48, borderRadius: '12px', background: 'var(--bg-warm)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--text-hint)" strokeWidth="1.5">
@@ -468,10 +596,10 @@ export default function Home() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{scan.product.name}</p>
-                        <p className="text-sm truncate" style={{ color: 'var(--text-muted)' }}>{scan.product.brand}</p>
+                        <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{entry.result.product.name}</p>
+                        <p className="text-sm truncate" style={{ color: 'var(--text-muted)' }}>{entry.result.product.brand}</p>
                       </div>
-                      <SafetyBadge rating={scan.overallSafety} size="sm" />
+                      <SafetyBadge rating={entry.result.overallSafety} size="sm" />
                     </button>
                   ))}
                 </div>
@@ -498,6 +626,19 @@ export default function Home() {
       </div>
     </main>
   );
+}
+
+function timeAgo(isoDate: string): string {
+  const seconds = Math.floor((Date.now() - new Date(isoDate).getTime()) / 1000);
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return `${days}d ago`;
+  return new Date(isoDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function FeatureCard({ icon, iconBg, title, description }: { icon: React.ReactNode; iconBg: string; title: string; description: string }) {
