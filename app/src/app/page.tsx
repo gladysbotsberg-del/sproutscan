@@ -182,6 +182,16 @@ export default function Home() {
     setError(null);
   };
 
+  const goHome = () => {
+    setResult(null);
+    setError(null);
+    setScanning(false);
+    setManualSearch(false);
+    setShowHistory(false);
+  };
+
+  const isHome = !scanning && !loading && !result && !error && !manualSearch && !showHistory;
+
   const changeStage = () => {
     setProfile(null);
     localStorage.removeItem('sproutscan_profile');
@@ -200,13 +210,32 @@ export default function Home() {
       >
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <SproutScanIcon size={32} />
-            <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)' }}>
-              Sprout<span style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scan</span>
-            </span>
+            {!isHome && (
+              <button
+                onClick={goHome}
+                className="p-1.5 -ml-1.5 rounded-full transition-colors"
+                style={{ color: 'var(--text-muted)' }}
+                aria-label="Back to home"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+            )}
+            <button
+              onClick={goHome}
+              className="flex items-center gap-2"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              aria-label="Go to home"
+            >
+              <SproutScanIcon size={32} />
+              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)' }}>
+                Sprout<span style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scan</span>
+              </span>
+            </button>
           </div>
           <div className="flex items-center gap-2">
-            {recentScans.length > 0 && !scanning && !loading && !result && !error && (
+            {recentScans.length > 0 && isHome && (
               <button
                 onClick={() => setShowHistory(true)}
                 className="p-2 rounded-full transition-colors"
