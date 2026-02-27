@@ -20,6 +20,7 @@ export default function ProductResult({ result, onScanAnother, onGoHome, onManua
   const [manualLoading, setManualLoading] = useState(false);
   const [manualError, setManualError] = useState<string | null>(null);
   const [showIngredientSnap, setShowIngredientSnap] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleManualSubmit = async () => {
     if (!manualText.trim() || !onManualIngredients) return;
@@ -31,6 +32,29 @@ export default function ProductResult({ result, onScanAnother, onGoHome, onManua
       setManualError('Failed to analyze. Please try again.');
     } finally {
       setManualLoading(false);
+    }
+  };
+
+  const shareResult = async () => {
+    const label = safetyConfig[result.overallSafety]?.label || 'Unknown';
+    const url = typeof window !== 'undefined' ? window.location.origin : '';
+    const text = `I scanned ${result.product.name} with SproutScan — it\u2019s ${label}! Check it out: ${url}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ text });
+        return;
+      } catch {
+        // User cancelled or share failed — fall through to clipboard
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard not available
     }
   };
 
@@ -505,6 +529,37 @@ export default function ProductResult({ result, onScanAnother, onGoHome, onManua
           }}
         >
           Scan Another Product
+        </button>
+        <button
+          onClick={shareResult}
+          className="w-full py-3.5 rounded-2xl font-semibold btn-press"
+          style={{
+            background: 'transparent',
+            border: '2px solid var(--brand-coral)',
+            color: 'var(--brand-coral)',
+          }}
+        >
+          <span className="flex items-center justify-center gap-2">
+            {copied ? (
+              <>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 6L9 17l-5-5" />
+                </svg>
+                Copied to clipboard!
+              </>
+            ) : (
+              <>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+                Share Result
+              </>
+            )}
+          </span>
         </button>
       </div>
 
