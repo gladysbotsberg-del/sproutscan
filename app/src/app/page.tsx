@@ -223,18 +223,20 @@ export default function Home() {
                 </svg>
               </button>
             )}
-            <button
-              type="button"
+            <div
+              role="button"
+              tabIndex={0}
               onClick={goHome}
+              onKeyDown={(e) => { if (e.key === 'Enter') goHome(); }}
               className="flex items-center gap-2"
-              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', WebkitTapHighlightColor: 'transparent' }}
+              style={{ cursor: 'pointer', padding: '4px 0', position: 'relative', zIndex: 1, pointerEvents: 'auto' }}
               aria-label="Go to home"
             >
-              <SproutScanIcon size={32} />
-              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)' }}>
+              <span style={{ pointerEvents: 'none' }}><SproutScanIcon size={32} /></span>
+              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '20px', color: 'var(--text-primary)', pointerEvents: 'none' }}>
                 Sprout<span style={{ background: 'var(--brand-gradient)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Scan</span>
               </span>
-            </button>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {recentScans.length > 0 && isHome && (
